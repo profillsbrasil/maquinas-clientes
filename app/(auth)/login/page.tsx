@@ -36,7 +36,7 @@ export default function LoginPage() {
         },
         {
           onSuccess: () => {
-            router.push("/dashboard");
+            router.push("/");
           },
           onError: (ctx) => {
             setError(ctx.error.message || "Erro ao fazer login");

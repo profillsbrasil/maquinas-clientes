@@ -50,7 +50,7 @@ export default function SignUpPage() {
         },
         {
           onSuccess: () => {
-            router.push("/dashboard");
+            router.push("/");
           },
           onError: (ctx) => {
             setError(ctx.error.message || "Erro ao criar conta");
