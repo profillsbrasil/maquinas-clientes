@@ -11,11 +11,13 @@
     "db:studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "clear": "rm -rf node_modules && rm -rf .next && rm -rf .turbo && rm -rf pnpm-lock.yaml && rm -rf bun.lock && rm -rf bun.lockb && rm -rf package-lock.json && rm -rf yarn.lock "
+    "clear": "rm -rf node_modules && rm -rf .next && rm -rf .turbo && rm -rf pnpm-lock.yaml && rm -rf bun.lock && rm -rf bun.lockb && rm -rf package-lock.json && rm -rf yarn.lock && rm -rf drizzle"
   },
   "dependencies": {
     "@libsql/client": "^0.15.15",
+    "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "better-auth": "^1.3.24",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
