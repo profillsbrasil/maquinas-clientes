@@ -16,11 +16,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Maquina } from '../../../_components/types';
 import { Eye, Settings, Store } from 'lucide-react';
 
-interface TpProps {
+interface EnvolvedoraProps {
   maquina: Maquina;
 }
 
-export default function Tp({ maquina }: TpProps) {
+export default function Envolvedora({ maquina }: EnvolvedoraProps) {
   const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
 
   const handleTogglePopover = (index: number) => {
@@ -29,15 +29,13 @@ export default function Tp({ maquina }: TpProps) {
 
   return (
     <div className='mx-auto h-full w-full flex flex-col gap-4'>
-      <h1 className='text-3xl font-bold w-full border-b  border-slate-900 pb-2 px-6 pt-6'>
-        Maquina: {maquina.name}
-      </h1>
-      <div className='flex  w-full h-full justify-evenly'>
-        <div className='relative w-1/2 h-full'>
+      <h1 className='text-3xl font-bold mb-4'>{maquina.name}</h1>
+      <div className='flex gap-4 w-full h-full justify-evenly'>
+        <div className='relative w-1/2'>
           <Image
             src={maquina.image}
             alt={maquina.name}
-            className='absolute top-0 left-0 w-full h-full object-contain'
+            className='w-full h-full object-contain'
           />
           {maquina.pecas.map((peca, index) => (
             <Popover
@@ -50,7 +48,7 @@ export default function Tp({ maquina }: TpProps) {
               </PopoverTrigger>
               <PopoverContent
                 align={index === 0 ? 'start' : 'end'}
-                className='bg-slate-800/90 w-full text-white text-center border-none'>
+                className='bg-slate-800/90 text-white text-center border-none'>
                 <p className='mb-2'>{peca.nome}</p>
                 <Button
                   asChild
@@ -70,7 +68,7 @@ export default function Tp({ maquina }: TpProps) {
               Peças presentes na sua máquina
             </p>
           </div>
-          <ScrollArea className='max-h-100 max-w-[30rem] p-4 bg-slate-800 text-white rounded-md'>
+          <ScrollArea className='max-h-100 w-[30rem] p-4 bg-slate-800 text-white rounded-md'>
             <div className='flex flex-col gap-2 w-full'>
               {maquina.pecas.map((peca, index) => (
                 <Button

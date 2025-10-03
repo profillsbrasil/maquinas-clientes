@@ -1,16 +1,50 @@
 import tp from '@/assets/images/maquinas/TP85.png';
-import evasadora from '@/assets/images/maquinas/envolvedora.png';
+import envolvedora from '@/assets/images/maquinas/envolvedora.png';
 
 const MaquinasData = [
   {
     id: 1,
-    name: 'Máquina 1',
-    image: tp
+    name: 'TP',
+    image: tp,
+    pecas: [
+      {
+        nome: 'Botão de Liga/Desliga',
+        descricao: 'Botão de Liga/Desliga',
+        localizacaoClassName: 'top-52 right-67',
+        linkLoja: 'https://www.google.com'
+      },
+      {
+        nome: 'Controlador de Velocidade do Motor',
+        descricao: 'Controlador de Velocidade do Motor',
+        localizacaoClassName: 'bottom-40 right-1/2',
+        linkLoja: 'https://www.google.com'
+      }
+    ]
   },
   {
     id: 2,
-    name: 'Máquina 2',
-    image: evasadora
+    name: 'Envolvedora',
+    image: envolvedora,
+    pecas: [
+      {
+        nome: 'Botão de Liga/Desliga',
+        descricao: 'Botão de Liga/Desliga',
+        localizacaoClassName: 'top-52 right-67',
+        linkLoja: 'https://www.google.com'
+      },
+      {
+        nome: 'Controlador de Velocidade do Motor',
+        descricao: 'Controlador de Velocidade do Motor',
+        localizacaoClassName: 'bottom-40 right-1/2',
+        linkLoja: 'https://www.google.com'
+      },
+      {
+        nome: 'Sensor de Nível',
+        descricao: 'Sensor de Nível',
+        localizacaoClassName: 'bottom-50 right-1/4',
+        linkLoja: 'https://www.google.com'
+      }
+    ]
   }
 ];
 
