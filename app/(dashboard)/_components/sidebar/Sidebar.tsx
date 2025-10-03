@@ -25,7 +25,15 @@ export default function Sidebar({ session, sidebarOpen }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isActive = (path: string) => pathname === path;
+  // TODO: Melhorar a lógica da sidebar no futuro
+  const isActive = (path: string) => {
+    // Para a rota raiz, verifica igualdade exata
+    if (path === '/') {
+      return pathname === path;
+    }
+    // Para outras rotas, verifica se o pathname começa com o path tipo /maquinas/1
+    return pathname.startsWith(path);
+  };
 
   return (
     <aside
