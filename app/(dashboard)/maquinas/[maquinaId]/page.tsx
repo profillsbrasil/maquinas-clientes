@@ -1,25 +1,26 @@
 import { notFound } from 'next/navigation';
 
 import MaquinasData from '../_components/MaquinasData';
+import Tp from './_components/maquinas/Tp';
 
 interface MaquinaPageProps {
-  params: {
+  params: Promise<{
     maquinaId: string;
-  };
+  }>;
 }
 
-export default function MaquinaPage({ params }: MaquinaPageProps) {
+export default async function MaquinaPage({ params }: MaquinaPageProps) {
+  const { maquinaId } = await params;
+
   const maquina = MaquinasData.find(
-    (maquina) => maquina.id === parseInt(params.maquinaId)
+    (maquina) => maquina.id === parseInt(maquinaId)
   );
   if (!maquina) {
     notFound();
   }
   return (
     <main className='flex-1 p-6 h-full w-full'>
-      <div className='mx-auto  h-full w-full flex flex-col gap-4 '>
-        <h1 className='text-3xl font-bold mb-4'>Máquina {params.maquinaId}</h1>
-      </div>
+      <Tp maquinaId={maquinaId} />
     </main>
   );
 }

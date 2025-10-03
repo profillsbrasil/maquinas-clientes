@@ -13,7 +13,7 @@ export default function DashboardPage() {
       <div className='max-w-7xl mx-auto'>
         <div className='mb-8'>
           <h2 className='text-3xl font-bold mb-2'>
-            Bem-vindo, {session.user.name}! 👋
+            Bem-vindo, {session.user.name}!
           </h2>
           <p className='text-muted-foreground'>Este é seu painel de controle</p>
         </div>
