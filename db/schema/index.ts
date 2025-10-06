@@ -1,7 +1,12 @@
 import { account } from './account';
-import { maquina_cliente } from './maquina_cliente';
-import { peca_maquina } from './peca_maquina';
+import { maquinas } from './maquinas';
 import { pecas } from './pecas';
+import { pecasNaMaquina } from './pecas_na_maquina';
+import {
+  maquinasRelations,
+  pecasNaMaquinaRelations,
+  pecasRelations
+} from './relations';
 import { session } from './session';
 import { user } from './user';
 import { verification } from './verification';
@@ -11,7 +16,10 @@ export const schema = {
   session,
   account,
   verification,
-  maquina_cliente,
-  peca_maquina,
-  pecas
+  pecas,
+  pecasRelations,
+  maquinas,
+  maquinasRelations,
+  pecasNaMaquina,
+  pecasNaMaquinaRelations
 };

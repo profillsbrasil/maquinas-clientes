@@ -1,4 +1,6 @@
-import Link from 'next/link';
+'use client';
+
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -11,8 +13,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -23,28 +23,86 @@ import {
 
 import { Plus, Store } from 'lucide-react';
 
-const pecas: { id: number; nome: string; linkLoja: string }[] = [
-  {
-    id: 1,
-    nome: 'Peca 1',
-    linkLoja: 'https://www.google.com'
-  },
-  {
-    id: 2,
-    nome: 'Peca 2',
-    linkLoja: 'https://www.google.com'
-  },
+type PecaType = {
+  id: string;
+  nome: string;
+  linkLojaIntegrada: string;
+};
 
-  {
-    id: 3,
-    nome: 'Peca 3',
-    linkLoja: 'https://www.google.com'
+type PecaNaMaquinaLocal = {
+  pecaId: string;
+  nome: string;
+  linkLoja: string;
+};
+
+type AdicionarPecaProps = {
+  localizacao: number;
+  pecasDisponiveis: PecaType[];
+  pecaExistente?: PecaNaMaquinaLocal | null;
+  onAdicionar: (localizacao: number, pecaId: string) => void;
+};
+
+export default function AdicionarPeca({
+  localizacao,
+  pecasDisponiveis,
+  pecaExistente,
+  onAdicionar
+}: AdicionarPecaProps) {
+  const [pecaSelecionada, setPecaSelecionada] = useState<string>('');
+  const [dialogAberto, setDialogAberto] = useState(false);
+
+  const pecaAtual = pecasDisponiveis.find((p) => p.id === pecaSelecionada);
+
+  function handleAdicionar() {
+    if (!pecaSelecionada) {
+      alert('Selecione uma peça');
+      return;
+    }
+
+    onAdicionar(localizacao, pecaSelecionada);
+    setDialogAberto(false);
+    setPecaSelecionada('');
   }
-];
 
-export default function AdicionarPeca() {
+  if (pecaExistente) {
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <span className='bg-green-600/30 border border-green-600 flex items-center justify-center text-xs p-1 text-white hover:bg-green-600/50 cursor-pointer'>
+            {pecaExistente.nome}
+          </span>
+        </DialogTrigger>
+        <DialogContent className='sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle>{pecaExistente.nome}</DialogTitle>
+            <DialogDescription>
+              Localização: Quadrado {localizacao}
+            </DialogDescription>
+          </DialogHeader>
+          <div className='flex flex-col gap-4'>
+            <a
+              href={pecaExistente.linkLoja}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800'>
+              <Store className='w-4 h-4' />
+              Ver na Loja Integrada
+            </a>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type='button' variant='secondary'>
+                Fechar
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
-    <Dialog>
+    <Dialog open={dialogAberto} onOpenChange={setDialogAberto}>
       <DialogTrigger asChild>
         <span className='text-white group border hover:bg-slate-800/50 flex items-center justify-center'>
           <Plus className='w-4 h-4 text-transparent group-hover:text-white' />
@@ -54,34 +112,33 @@ export default function AdicionarPeca() {
         <DialogHeader>
           <DialogTitle>Adicionar Uma Peça</DialogTitle>
           <DialogDescription>
-            Adicione a peça na localização que selecionou
+            Localização: Quadrado {localizacao}
           </DialogDescription>
         </DialogHeader>
-        <div className='flex flex-col gap-2'>
-          <Select>
+        <div className='flex flex-col gap-4'>
+          <Select value={pecaSelecionada} onValueChange={setPecaSelecionada}>
             <SelectTrigger className='w-full'>
               <SelectValue placeholder='Selecione a peça' />
             </SelectTrigger>
             <SelectContent>
-              {pecas.map((peca, index) => (
-                <SelectItem key={index} value={peca.nome}>
+              {pecasDisponiveis.map((peca) => (
+                <SelectItem key={peca.id} value={peca.id}>
                   {peca.nome}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <div className='flex  gap-2'>
-            <Input type='text' placeholder='Link da loja integrada' />
-
-            {/* TODO: mudar para o link da loja integrada */}
-            <Link
-              href={pecas[0].linkLoja}
+          {pecaAtual && (
+            <a
+              href={pecaAtual.linkLojaIntegrada}
               target='_blank'
-              className=' flex items-center justify-center size-8'>
-              <Store className='w-4 h-4 text-black hover:text-black/80' />
-            </Link>
-          </div>
+              rel='noopener noreferrer'
+              className='flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800'>
+              <Store className='w-4 h-4' />
+              Ver na Loja Integrada
+            </a>
+          )}
         </div>
         <DialogFooter className='sm:justify-end '>
           <DialogClose asChild>
@@ -89,7 +146,7 @@ export default function AdicionarPeca() {
               Cancelar
             </Button>
           </DialogClose>
-          <Button type='button' variant='default'>
+          <Button type='button' variant='default' onClick={handleAdicionar}>
             Adicionar
           </Button>
         </DialogFooter>

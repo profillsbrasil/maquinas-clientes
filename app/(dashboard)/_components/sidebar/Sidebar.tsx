@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { handleLogout } from '@/lib/auth-helpers';
 import iconeProfills from '@/public/icon.png';
 
-import { Home, LogOut, Plus, Settings, Users } from 'lucide-react';
+import { Box, Home, LogOut, Plus, Settings, Users } from 'lucide-react';
 
 interface SidebarProps {
   session: {
@@ -81,6 +81,17 @@ export default function Sidebar({ session, sidebarOpen }: SidebarProps) {
               {sidebarOpen && (
                 <span className='font-medium'>Suas Máquinas</span>
               )}
+            </Button>
+            <Button
+              variant='ghost'
+              className={`w-full gap-4 transition-all duration-200  border-transparent rounded-none hover:text-primary-foreground/80 text-primary-foreground bg-slate-900  hover:bg-slate-900   ${
+                isActive('/maquinas')
+                  ? 'border-y border-border/20  !hover:border-border/10 '
+                  : ''
+              } ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
+              onClick={() => router.push('/maquinas')}>
+              <Box className='size-4' />
+              {sidebarOpen && <span className='font-medium'>Máquinas</span>}
             </Button>
             <Button
               variant='ghost'

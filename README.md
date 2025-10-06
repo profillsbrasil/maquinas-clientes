@@ -59,8 +59,8 @@ Criar em `app/(dashboard)/nova-pagina/page.tsx`:
 ```tsx
 export default function NovaPaginaPage() {
   return (
-    <main className="flex-1 p-6">
-      <div className="max-w-7xl mx-auto">
+    <main className='flex-1 p-6'>
+      <div className='max-w-7xl mx-auto'>
         <h1>Nova Página</h1>
       </div>
     </main>
