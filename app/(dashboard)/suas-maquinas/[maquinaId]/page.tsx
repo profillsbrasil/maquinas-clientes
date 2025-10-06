@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 
 import MaquinasData from './_components/MaquinasData';
 import Envolvedora from './_components/maquinas/Envolvedora';
-import Teste from './_components/maquinas/Teste';
 import Tp from './_components/maquinas/Tp';
 
 interface MaquinaPageProps {
@@ -29,8 +28,6 @@ export default async function MaquinaPage({ params }: MaquinaPageProps) {
         return <Tp maquina={maquina} />;
       case '2':
         return <Envolvedora maquina={maquina} />;
-      case '3':
-        return <Teste maquina={maquina} />;
       default:
         notFound();
     }

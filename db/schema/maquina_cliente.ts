@@ -14,20 +14,18 @@ const timestamp = customType<{ data: Date; driverData: string }>({
   }
 });
 
-export const session = sqliteTable('session', {
+export const maquina_cliente = sqliteTable('maquina_cliente', {
   id: text('id').primaryKey(),
-  expiresAt: timestamp('expires_at').notNull(),
-  token: text('token').notNull().unique(),
+  nome: text('nome').notNull(),
+  imagem: text('imagem'),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at')
     .notNull()
     .default(sql`(datetime('now'))`),
   updatedAt: timestamp('updated_at')
     .notNull()
     .default(sql`(datetime('now'))`)
-    .$onUpdate(() => new Date()),
-  ipAddress: text('ip_address'),
-  userAgent: text('user_agent'),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' })
+    .$onUpdate(() => new Date())
 });

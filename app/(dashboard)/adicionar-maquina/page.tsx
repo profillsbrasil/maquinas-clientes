@@ -7,6 +7,7 @@ import MaquinaTp from '@/assets/images/maquinas/TP85.png';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
+import AdicionarPeca from './_components/AdicionarPeca';
 import { ChevronLeft, ChevronRight, Plus, Settings, X } from 'lucide-react';
 
 export default function AdicionarMaquinaPage() {
@@ -22,22 +23,18 @@ export default function AdicionarMaquinaPage() {
             />
             <div className='absolute  top-0 left-0 w-full h-full  grid grid-cols-30 hover:cursor-pointer '>
               {Array.from({ length: 600 }).map((_, index) => (
-                <span
-                  key={index}
-                  className='text-white group border hover:bg-slate-800/50 flex items-center justify-center'>
-                  <Plus className='w-4 h-4 text-transparent group-hover:text-white' />
-                </span>
+                <AdicionarPeca key={index} />
               ))}
             </div>
           </div>
-          <div className='flex flex-col gap-4 max-w-[30rem] pt-30'>
-            <div>
+          <div className='flex flex-col gap-4 max-w-[30rem] pt-30 justify-start items-center'>
+            <div className='flex flex-col gap-2 w-full justify-start items-start'>
               <h2 className='text-2xl font-bold'>Lista de Peças</h2>
               <p className='text-muted-foreground'>
                 Peças presentes na sua máquina
               </p>
             </div>
-            <ScrollArea className='max-h-100 h-50 w-[30rem] p-4 bg-slate-800 text-white rounded-md'>
+            <ScrollArea className='max-h-100  w-[30rem] p-4 bg-slate-800 text-white rounded-md'>
               <div className='flex flex-col gap-2 w-full justify-center items-center'>
                 <Button
                   className={`flex   items-center gap-2 w-full justify-start hover:bg-slate-700 hover:text-white bg-slate-700`}
@@ -45,14 +42,13 @@ export default function AdicionarMaquinaPage() {
                   <Settings className='w-4 h-4' />
                   <span>Peca 1</span>
                 </Button>
-
-                <Button
-                  className={`flex items-center gap-2 w-10 justify-center hover:bg-slate-700 hover:text-white bg-slate-700`}
-                  variant='ghost'>
-                  <Plus className='w-4 h-4' />
-                </Button>
               </div>
             </ScrollArea>
+            <Button
+              className={`flex text-white items-center gap-2 w-10 justify-center hover:bg-slate-700 hover:text-white bg-slate-700`}
+              variant='ghost'>
+              <Plus className='w-4 h-4' />
+            </Button>
           </div>
         </div>
         <div className='w-full relative h-16 bg-slate-900 flex items-center justify-between'>

@@ -1,4 +1,4 @@
-import { maquina } from './maquina';
+import { maquina_cliente } from './maquina_cliente';
 import { sql } from 'drizzle-orm';
 import { customType, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
@@ -14,14 +14,14 @@ const timestamp = customType<{ data: Date; driverData: string }>({
   }
 });
 
-export const peca = sqliteTable('peca', {
+export const peca_maquina = sqliteTable('peca_maquina', {
   id: text('id').primaryKey(),
   nome: text('nome').notNull(),
   linkLoja: text('link_loja'),
   localizacao: text('localizacao'),
   maquinaId: text('maquina_id')
     .notNull()
-    .references(() => maquina.id, { onDelete: 'cascade' }),
+    .references(() => maquina_cliente.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at')
     .notNull()
     .default(sql`(datetime('now'))`),

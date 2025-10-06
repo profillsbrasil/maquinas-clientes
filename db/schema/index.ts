@@ -1,8 +1,9 @@
 import { account } from './account';
+import { maquina_cliente } from './maquina_cliente';
+import { peca_maquina } from './peca_maquina';
+import { pecas } from './pecas';
 import { session } from './session';
-import { maquina } from './user/maquina';
-import { peca } from './user/peca';
-import { user } from './user/user';
+import { user } from './user';
 import { verification } from './verification';
 
 export const schema = {
@@ -10,6 +11,7 @@ export const schema = {
   session,
   account,
   verification,
-  maquina,
-  peca
+  maquina_cliente,
+  peca_maquina,
+  pecas
 };

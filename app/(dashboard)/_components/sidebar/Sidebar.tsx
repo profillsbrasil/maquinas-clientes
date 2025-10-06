@@ -72,14 +72,14 @@ export default function Sidebar({ session, sidebarOpen }: SidebarProps) {
             <Button
               variant='ghost'
               className={`w-full gap-4 transition-all duration-200  border-transparent rounded-none hover:text-primary-foreground/80 text-primary-foreground bg-slate-900  hover:bg-slate-900   ${
-                isActive('/maquinas')
+                isActive('/suas-maquinas')
                   ? 'border-y border-border/20  !hover:border-border/10 '
                   : ''
               } ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
-              onClick={() => router.push('/maquinas')}>
+              onClick={() => router.push('/suas-maquinas')}>
               <Users className='size-4' />
               {sidebarOpen && (
-                <span className='font-medium'>Suas Maquinas</span>
+                <span className='font-medium'>Suas Máquinas</span>
               )}
             </Button>
             <Button
@@ -92,7 +92,20 @@ export default function Sidebar({ session, sidebarOpen }: SidebarProps) {
               onClick={() => router.push('/adicionar-maquina')}>
               <Plus className='size-4' />
               {sidebarOpen && (
-                <span className='font-medium'>Adicionar Maquina</span>
+                <span className='font-medium'>Adicionar Máquina</span>
+              )}
+            </Button>
+            <Button
+              variant='ghost'
+              className={`w-full gap-4 transition-all duration-200  border-transparent rounded-none hover:text-primary-foreground/80 text-primary-foreground bg-slate-900  hover:bg-slate-900   ${
+                isActive('/adicionar-peca')
+                  ? 'border-y border-border/20  !hover:border-border/10 '
+                  : ''
+              } ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
+              onClick={() => router.push('/adicionar-peca')}>
+              <Plus className='size-4' />
+              {sidebarOpen && (
+                <span className='font-medium'>Adicionar Peça</span>
               )}
             </Button>
             <Button

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 
 import MaquinasData from './[maquinaId]/_components/MaquinasData';
 
-export default function MaquinasPage() {
+export default function SuasMaquinasPage() {
   const router = useRouter();
   return (
     <main className='flex-1 p-5 h-full w-full'>
@@ -20,7 +20,7 @@ export default function MaquinasPage() {
         </div>
         <div className='grid grid-cols-4 gap-6'>
           {MaquinasData.map((maquina) => (
-            <Link href={`/maquinas/${maquina.id}`} key={maquina.id}>
+            <Link href={`/suas-maquinas/${maquina.id}`} key={maquina.id}>
               <div
                 key={maquina.id}
                 className='flex relative flex-col hover:scale-101 transition-all duration-300 items-center border border-slate-900 shadow-md rounded-sm  justify-center max-h-100 bg-muted'>
