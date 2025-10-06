@@ -1,9 +1,9 @@
 /**
  * Helpers de autenticação para uso em componentes client
  */
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-import { signOut as authSignOut } from "./auth-client";
-import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { signOut as authSignOut } from './auth-client';
 
 /**
  * Função unificada de logout
@@ -11,7 +11,7 @@ import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.
  */
 export async function handleLogout() {
   await authSignOut();
-  window.location.href = "/login";
+  window.location.href = '/login';
 }
 
 /**
@@ -24,6 +24,6 @@ export function redirectIfNotAuthenticated(
   router: AppRouterInstance
 ) {
   if (!isPending && !session) {
-    router.push("/login");
+    router.push('/login');
   }
 }

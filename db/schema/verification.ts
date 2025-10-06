@@ -1,16 +1,28 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
+import { sql } from 'drizzle-orm';
+import { customType, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const verification = sqliteTable("verification", {
-  id: text("id").primaryKey(),
-  identifier: text("identifier").notNull(),
-  value: text("value").notNull(),
-  expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
+const timestamp = customType<{ data: Date; driverData: string }>({
+  dataType() {
+    return 'text';
+  },
+  toDriver(value: Date): string {
+    return value.toISOString().replace('T', ' ').substring(0, 19);
+  },
+  fromDriver(value: string): Date {
+    return new Date(value);
+  }
+});
+
+export const verification = sqliteTable('verification', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at')
     .notNull()
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .default(sql`(datetime('now'))`),
+  updatedAt: timestamp('updated_at')
     .notNull()
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-    .$onUpdate(() => new Date()),
+    .default(sql`(datetime('now'))`)
+    .$onUpdate(() => new Date())
 });

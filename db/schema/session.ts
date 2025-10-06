@@ -1,20 +1,33 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
-import { user } from "./user";
+import { user } from './user';
+import { sql } from 'drizzle-orm';
+import { customType, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const session = sqliteTable("session", {
-  id: text("id").primaryKey(),
-  expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
-  token: text("token").notNull().unique(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
+const timestamp = customType<{ data: Date; driverData: string }>({
+  dataType() {
+    return 'text';
+  },
+  toDriver(value: Date): string {
+    return value.toISOString().replace('T', ' ').substring(0, 19);
+  },
+  fromDriver(value: string): Date {
+    return new Date(value);
+  }
+});
+
+export const session = sqliteTable('session', {
+  id: text('id').primaryKey(),
+  expiresAt: timestamp('expires_at').notNull(),
+  token: text('token').notNull().unique(),
+  createdAt: timestamp('created_at')
     .notNull()
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .default(sql`(datetime('now'))`),
+  updatedAt: timestamp('updated_at')
     .notNull()
+    .default(sql`(datetime('now'))`)
     .$onUpdate(() => new Date()),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  userId: text("user_id")
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  userId: text('user_id')
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => user.id, { onDelete: 'cascade' })
 });

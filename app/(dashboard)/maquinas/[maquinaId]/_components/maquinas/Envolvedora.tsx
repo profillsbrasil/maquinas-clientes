@@ -14,7 +14,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 import type { Maquina } from '../../../_components/types';
-import { Eye, Settings, Store } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Settings, Store } from 'lucide-react';
 
 interface EnvolvedoraProps {
   maquina: Maquina;
@@ -29,7 +29,6 @@ export default function Envolvedora({ maquina }: EnvolvedoraProps) {
 
   return (
     <div className='mx-auto h-full w-full flex flex-col gap-4'>
-      <h1 className='text-3xl font-bold mb-4'>{maquina.name}</h1>
       <div className='flex gap-4 w-full h-full justify-evenly'>
         <div className='relative w-1/2'>
           <Image
@@ -85,6 +84,31 @@ export default function Envolvedora({ maquina }: EnvolvedoraProps) {
             </div>
           </ScrollArea>
         </div>
+      </div>
+      <div className='w-full relative h-20 bg-slate-900 flex items-center justify-between'>
+        <div className='flex items-center justify-center h-full'>
+          <Link
+            href='/maquinas'
+            className=' h-full flex items-center justify-center'>
+            <Button
+              variant='outline'
+              className='w-full rounded-none h-full hover:bg-slate-700/90 hover:text-white flex items-center justify-center bg-slate-800 text-white border-border/20'>
+              <ChevronLeft className='size-6' />
+            </Button>
+          </Link>
+          <h1 className='text-3xl font-bold w-full h-full flex items-center text-white px-10'>
+            Maquina: {maquina.name}
+          </h1>
+        </div>
+        <Link
+          href='/maquinas'
+          className=' h-full flex items-center justify-center'>
+          <Button
+            variant='outline'
+            className='w-full rounded-none h-full hover:bg-slate-700/90 hover:text-white flex items-center justify-center bg-slate-800 text-white border-border/20'>
+            <ChevronRight className='size-6' />
+          </Button>
+        </Link>
       </div>
     </div>
   );

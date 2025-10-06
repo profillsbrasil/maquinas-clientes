@@ -14,7 +14,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 import type { Maquina } from '../../../_components/types';
-import { Eye, Settings, Store } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Settings, Store } from 'lucide-react';
 
 interface TpProps {
   maquina: Maquina;
@@ -29,9 +29,6 @@ export default function Tp({ maquina }: TpProps) {
 
   return (
     <div className='mx-auto h-full w-full flex flex-col gap-4'>
-      <h1 className='text-3xl font-bold w-full border-b  border-slate-900 pb-2 px-6 pt-6'>
-        Maquina: {maquina.name}
-      </h1>
       <div className='flex  w-full h-full justify-evenly'>
         <div className='relative w-1/2 h-full'>
           <Image
@@ -63,14 +60,14 @@ export default function Tp({ maquina }: TpProps) {
             </Popover>
           ))}
         </div>
-        <div className='flex flex-col gap-4 max-w-[30rem] pt-30'>
+        <div className='flex flex-col gap-4 w-[30rem] h-full pt-20'>
           <div>
             <h2 className='text-2xl font-bold'>Lista de Peças</h2>
             <p className='text-muted-foreground'>
               Peças presentes na sua máquina
             </p>
           </div>
-          <ScrollArea className='max-h-100 max-w-[30rem] p-4 bg-slate-800 text-white rounded-md'>
+          <ScrollArea className='max-h-100 w-[22rem] p-4 bg-slate-800 text-white rounded-md'>
             <div className='flex flex-col gap-2 w-full'>
               {maquina.pecas.map((peca, index) => (
                 <Button
@@ -87,6 +84,31 @@ export default function Tp({ maquina }: TpProps) {
             </div>
           </ScrollArea>
         </div>
+      </div>
+      <div className='w-full relative h-20 bg-slate-900 flex items-center justify-between'>
+        <div className='flex items-center justify-center h-full'>
+          <Link
+            href='/maquinas'
+            className=' h-full flex items-center justify-center'>
+            <Button
+              variant='outline'
+              className='w-full rounded-none h-full hover:bg-slate-700/90 hover:text-white flex items-center justify-center bg-slate-800 text-white border-border/20'>
+              <ChevronLeft className='size-6' />
+            </Button>
+          </Link>
+          <h1 className='text-2xl font-bold w-full h-full flex items-center text-white px-10'>
+            Maquina: {maquina.name}
+          </h1>
+        </div>
+        <Link
+          href='/maquinas'
+          className=' h-full flex items-center justify-center'>
+          <Button
+            variant='outline'
+            className='w-full rounded-none h-full hover:bg-slate-700/90 hover:text-white flex items-center justify-center bg-slate-800 text-white border-border/20'>
+            <ChevronRight className='size-6' />
+          </Button>
+        </Link>
       </div>
     </div>
   );

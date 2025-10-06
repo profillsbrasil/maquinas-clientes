@@ -1,6 +1,6 @@
 export interface Peca {
   nome: string;
-  descricao: string;
+  descricao?: string;
   localizacaoClassName: string;
   linkLoja: string;
 }
