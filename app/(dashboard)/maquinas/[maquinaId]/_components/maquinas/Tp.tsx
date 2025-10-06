@@ -67,7 +67,7 @@ export default function Tp({ maquina }: TpProps) {
               Peças presentes na sua máquina
             </p>
           </div>
-          <ScrollArea className='max-h-100 w-[22rem] p-4 bg-slate-800 text-white rounded-md'>
+          <ScrollArea className='max-h-100  w-[22rem] p-4 bg-slate-800 text-white rounded-sm '>
             <div className='flex flex-col gap-2 w-full'>
               {maquina.pecas.map((peca, index) => (
                 <Button
@@ -86,7 +86,7 @@ export default function Tp({ maquina }: TpProps) {
         </div>
       </div>
       <div className='w-full relative h-16 bg-slate-900 flex items-center justify-between'>
-        <div className='flex items-center justify-center h-full'>
+        <div className='flex w-1/2 items-center justify-center h-full gap-10'>
           <Link
             href='/maquinas'
             className=' h-full flex items-center justify-center'>
@@ -96,19 +96,26 @@ export default function Tp({ maquina }: TpProps) {
               <ChevronLeft className='size-6' />
             </Button>
           </Link>
-          <h1 className='text-2xl font-bold w-full h-full flex items-center text-white px-10'>
+          <h1 className='text-2xl font-bold w-full h-full flex items-center text-white '>
             Maquina: {maquina.name}
           </h1>
         </div>
-        <Link
-          href='/maquinas'
-          className=' h-full flex items-center justify-center'>
+        <div className='flex  w-1/2 h-full gap-10 justify-end items-center'>
           <Button
             variant='outline'
-            className='w-full rounded-none h-full hover:bg-slate-700/90 hover:text-white flex items-center justify-center bg-slate-800 text-white border-border/20'>
-            <ChevronRight className='size-6' />
+            className='  h-10 rounded-sm hover:bg-slate-700/90 hover:text-white flex items-center justify-center bg-slate-800 w-44 text-white border-border/20'>
+            Solicitar Auxilio
           </Button>
-        </Link>
+          <Link
+            href='/maquinas'
+            className=' h-full flex items-center justify-center'>
+            <Button
+              variant='outline'
+              className='w-full rounded-none h-full hover:bg-slate-700/90 hover:text-white flex items-center justify-center bg-slate-800 text-white border-border/20'>
+              <ChevronRight className='size-6' />
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
