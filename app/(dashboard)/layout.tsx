@@ -14,7 +14,8 @@ import Sidebar from './_components/sidebar/Sidebar';
 const routeTitles: Record<string, string> = {
   '/': 'Dashboard',
   '/maquinas': 'Suas Maquinas',
-  '/configuracoes': 'Configurações'
+  '/configuracoes': 'Configurações',
+  '/adicionar-maquina': 'Adicionar Maquina'
 };
 
 export default function DashboardLayout({

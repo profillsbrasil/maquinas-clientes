@@ -1,0 +1,120 @@
+'use client';
+
+import { useState } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+import type { Maquina } from '../types';
+import { ChevronLeft, ChevronRight, Eye, Settings, Store } from 'lucide-react';
+
+interface TesteProps {
+  maquina: Maquina;
+}
+
+export default function Teste({ maquina }: TesteProps) {
+  const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
+
+  const handleTogglePopover = (index: number) => {
+    setOpenPopoverIndex(openPopoverIndex === index ? null : index);
+  };
+
+  return (
+    <div className='mx-auto h-full w-full flex flex-col gap-4'>
+      <div className='flex gap-4 w-full h-full justify-evenly'>
+        <div className='relative w-1/2'>
+          <Image
+            src={maquina.image}
+            alt={maquina.name}
+            className='w-full h-full object-contain'
+          />
+          <div className='absolute top-0 left-0 w-full h-full bg-slate-800/50 grid grid-cols-20 '>
+            {Array.from({ length: 300 }).map((_, index) => (
+              <span key={index} className='text-white border'>
+                {index + 1}
+              </span>
+            ))}
+
+            <Popover
+              open={openPopoverIndex === 0}
+              onOpenChange={(open) => setOpenPopoverIndex(open ? 0 : null)}>
+              <PopoverTrigger
+                className={`absolute size-8 top-2 left-12 flex justify-center items-center z-10 rounded-full bg-slate-800/40 text-white hover:bg-slate-800/90 `}>
+                <Eye className='w-4 h-4' />
+              </PopoverTrigger>
+              <PopoverContent
+                align={0 === 0 ? 'start' : 'end'}
+                className='bg-slate-800/90 text-white text-center border-none'>
+                <p className='mb-2'>{maquina.pecas[0].nome}</p>
+                <Button
+                  asChild
+                  className='w-full bg-slate-800 border-border/20 border hover:bg-slate-800/90'>
+                  <Link href={maquina.pecas[0].linkLoja} target='_blank'>
+                    <Store className='w-4 h-4' /> Ver na Loja
+                  </Link>
+                </Button>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+        <div className='flex flex-col gap-4 max-w-[30rem] pt-30'>
+          <div>
+            <h2 className='text-2xl font-bold'>Lista de Peças</h2>
+            <p className='text-muted-foreground'>
+              Peças presentes na sua máquina
+            </p>
+          </div>
+          <ScrollArea className='max-h-100 w-[30rem] p-4 bg-slate-800 text-white rounded-md'>
+            <div className='flex flex-col gap-2 w-full'>
+              {maquina.pecas.map((peca, index) => (
+                <Button
+                  key={index}
+                  onClick={() => handleTogglePopover(index)}
+                  className={`flex items-center gap-2 w-full justify-start hover:bg-slate-700 hover:text-white ${
+                    openPopoverIndex === index ? 'bg-slate-700' : ''
+                  }`}
+                  variant='ghost'>
+                  <Settings className='w-4 h-4' />
+                  <span>{peca.nome}</span>
+                </Button>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+      </div>
+      <div className='w-full relative h-16 bg-slate-900 flex items-center justify-between'>
+        <div className='flex items-center justify-center h-full'>
+          <Link
+            href='/maquinas'
+            className=' h-full flex items-center justify-center'>
+            <Button
+              variant='outline'
+              className='w-full rounded-none h-full hover:bg-slate-700/90 hover:text-white flex items-center justify-center bg-slate-800 text-white border-border/20'>
+              <ChevronLeft className='size-6' />
+            </Button>
+          </Link>
+          <h1 className='text-3xl font-bold w-full h-full flex items-center text-white px-10'>
+            Maquina: {maquina.name}
+          </h1>
+        </div>
+        <Link
+          href='/maquinas'
+          className=' h-full flex items-center justify-center'>
+          <Button
+            variant='outline'
+            className='w-full rounded-none h-full hover:bg-slate-700/90 hover:text-white flex items-center justify-center bg-slate-800 text-white border-border/20'>
+            <ChevronRight className='size-6' />
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
