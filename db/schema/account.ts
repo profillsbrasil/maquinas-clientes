@@ -1,4 +1,4 @@
-import { user } from './user';
+import { user } from './user/user';
 import { sql } from 'drizzle-orm';
 import { customType, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 

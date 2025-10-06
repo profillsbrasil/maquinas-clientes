@@ -1,8 +1,8 @@
 import { account } from './account';
-import { maquina } from './maquina';
-import { peca } from './peca';
 import { session } from './session';
-import { user } from './user';
+import { maquina } from './user/maquina';
+import { peca } from './user/peca';
+import { user } from './user/user';
 import { verification } from './verification';
 
 export const schema = {
