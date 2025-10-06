@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-import type { Maquina } from '../../../_components/types';
+import type { Maquina } from '../types';
 import { ChevronLeft, ChevronRight, Eye, Settings, Store } from 'lucide-react';
 
 interface EnvolvedoraProps {
@@ -85,7 +85,7 @@ export default function Envolvedora({ maquina }: EnvolvedoraProps) {
           </ScrollArea>
         </div>
       </div>
-      <div className='w-full relative h-20 bg-slate-900 flex items-center justify-between'>
+      <div className='w-full relative h-16 bg-slate-900 flex items-center justify-between'>
         <div className='flex items-center justify-center h-full'>
           <Link
             href='/maquinas'

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import MaquinasData from '../_components/MaquinasData';
+import MaquinasData from './_components/MaquinasData';
 import Envolvedora from './_components/maquinas/Envolvedora';
 import Tp from './_components/maquinas/Tp';
 

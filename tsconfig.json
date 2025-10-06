@@ -27,7 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/(dashboard)/maquinas/_components/MaquinasData.tx"
+    "app/(dashboard)/maquinas/_components/MaquinasData.tx",
+    ".doc/COMO_USAR_SESSOES.tsx"
   ],
   "exclude": ["node_modules"]
 }

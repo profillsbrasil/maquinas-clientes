@@ -16,7 +16,7 @@ export default function Header({
   title
 }: HeaderProps) {
   return (
-    <header className='h-16 border-b bg-slate-900 backdrop-blur-sm flex items-center px-6 '>
+    <header className='h-16 fixed  w-full bg-slate-900 backdrop-blur-sm flex items-center px-6 z-50'>
       <Button
         variant='ghost'
         size='icon'

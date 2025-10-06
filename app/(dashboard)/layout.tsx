@@ -52,13 +52,13 @@ export default function DashboardLayout({
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />
-      <div className='flex-1 flex flex-col'>
+      <div className='flex-1 flex flex-col  '>
         <Header
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           title={pageTitle}
         />
-        {children}
+        <div className='pt-16 flex-1'>{children}</div>
       </div>
     </div>
   );
