@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { GridPatternBg } from '@/components/gridPatternBg';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,10 +72,8 @@ export default function CardMaquina({
   }
 
   return (
-    <>
-      <div className='flex relative flex-col hover:scale-101 transition-all duration-300 items-center border border-slate-900 shadow-md rounded-sm justify-center bg-muted group'>
-        <GridPatternBg />
-
+    <Link href={`/maquinas/${id}`}>
+      <div className='flex relative bg-background flex-col hover:scale-101 transition-all duration-300 items-center border border-slate-900 shadow-md rounded-sm justify-center  group'>
         {/* Imagem */}
         <div className='flex h-75 px-4 py-2 w-full z-10 relative'>
           <Image
@@ -87,7 +84,7 @@ export default function CardMaquina({
             className='w-full h-full object-contain'
           />
           {totalPecas > 0 && (
-            <div className='absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded-full flex items-center gap-2 text-sm font-medium'>
+            <div className='absolute top-4 right-4 bg-slate-800 text-white px-3 py-1 rounded-sm flex items-center gap-2 text-sm font-medium'>
               <Package className='w-4 h-4' />
               {totalPecas}
             </div>
@@ -95,8 +92,8 @@ export default function CardMaquina({
         </div>
 
         {/* Informações */}
-        <div className='flex-1 h-25 px-4 pb-4 w-full text-center space-y-2 z-10'>
-          <h2 className='text-2xl font-bold truncate'>{nome}</h2>
+        <div className='flex-1 h-25 border-t border-slate-900 px-4 pb-4 pt-2 w-full text-center space-y-2 z-10'>
+          <h2 className='text-xl font-bold truncate'>{nome}</h2>
 
           <div className='flex gap-2'>
             <Button
@@ -109,14 +106,14 @@ export default function CardMaquina({
             <Button
               variant='outline'
               onClick={handleEditar}
-              className='flex-1 bg-blue-600 rounded-sm text-white hover:bg-blue-700 hover:text-white'>
+              className='flex-1 bg-slate-700 rounded-sm text-white hover:bg-slate-700/90 hover:text-white'>
               <Edit className='w-4 h-4 mr-2' />
               Editar
             </Button>
             <Button
               variant='outline'
               onClick={handleDeletar}
-              className='bg-red-600 rounded-sm text-white hover:bg-red-700 hover:text-white'>
+              className='bg-red-700 rounded-sm text-white hover:bg-red-700/90 hover:text-white'>
               <Trash2 className='w-4 h-4' />
             </Button>
           </div>
@@ -146,6 +143,6 @@ export default function CardMaquina({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </Link>
   );
 }

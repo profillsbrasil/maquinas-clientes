@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 
 import { listarTodasMaquinas } from './_actions/listar-maquinas';
 import CardMaquina from './_components/CardMaquina';
@@ -39,7 +40,12 @@ export default function MaquinasPage() {
   if (loading) {
     return (
       <main className='flex-1 p-5 h-full w-full flex items-center justify-center'>
-        <div className='text-xl'>Carregando máquinas...</div>
+        <div className='flex flex-col items-center gap-4'>
+          <Spinner className='size-12 text-slate-800' />
+          <div className='text-xl text-muted-foreground'>
+            Carregando máquinas...
+          </div>
+        </div>
       </main>
     );
   }
@@ -56,7 +62,7 @@ export default function MaquinasPage() {
               </p>
             </div>
             <Link href='/adicionar-maquina'>
-              <Button className='bg-green-600 hover:bg-green-700 text-white'>
+              <Button className='bg-green-900 hover:bg-green-700 text-white'>
                 <Plus className='w-4 h-4 mr-2' />
                 Nova Máquina
               </Button>
@@ -84,7 +90,7 @@ export default function MaquinasPage() {
   }
 
   return (
-    <main className='flex-1 p-5 h-full w-full'>
+    <main className='flex-1 p-5 h-full w-full bg-muted'>
       <div className='mx-auto h-full w-full flex flex-col'>
         <div className='mb-4 flex items-center justify-between'>
           <div>
@@ -95,7 +101,7 @@ export default function MaquinasPage() {
             </p>
           </div>
           <Link href='/adicionar-maquina'>
-            <Button className='bg-green-600 hover:bg-green-700 text-white'>
+            <Button className='bg-slate-800 hover:bg-slate-700 text-white rounded-sm'>
               <Plus className='w-4 h-4 mr-2' />
               Nova Máquina
             </Button>

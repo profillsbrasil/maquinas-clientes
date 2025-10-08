@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 
 import { criarMaquina, listarPecasDisponiveis } from './_actions/maquinas';
 import AdicionarPeca from './_components/AdicionarPeca';
@@ -183,7 +184,10 @@ export default function AdicionarMaquinaPage() {
   if (loading) {
     return (
       <div className='flex-1 h-full w-full flex items-center justify-center'>
-        <div className='text-white text-xl'>Carregando...</div>
+        <div className='flex flex-col items-center gap-4'>
+          <Spinner className='size-12 text-slate-800' />
+          <div className='text-xl text-muted-foreground'>Carregando...</div>
+        </div>
       </div>
     );
   }
@@ -335,8 +339,17 @@ export default function AdicionarMaquinaPage() {
               salvando || !nomeMaquina.trim() || pecasAdicionadas.length === 0
             }
             className='h-14 min-w-48 bg-green-600 border-none rounded-none hover:bg-green-700 text-white disabled:opacity-50'>
-            <Save className='size-5 mr-1' />
-            {salvando ? 'Salvando...' : 'Salvar Máquina'}
+            {salvando ? (
+              <>
+                <Spinner className='size-5 mr-2' />
+                Salvando...
+              </>
+            ) : (
+              <>
+                <Save className='size-5 mr-1' />
+                Salvar Máquina
+              </>
+            )}
           </Button>
         </div>
       </div>
