@@ -126,8 +126,8 @@ export default function CardMaquina({ id, nome, imagem, totalPecas }: Props) {
           <AlertDialogHeader>
             <AlertDialogTitle>Deletar Máquina</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja deletar a máquina "{nome}"? Esta ação não
-              pode ser desfeita.
+              Tem certeza que deseja deletar a máquina &quot;{nome}&quot;? Esta
+              ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

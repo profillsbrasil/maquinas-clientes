@@ -135,8 +135,8 @@ export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Deletar Peça</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja deletar a peça "{pecaParaDeletar?.nome}"?
-              Esta ação não pode ser desfeita.
+              Tem certeza que deseja deletar a peça &quot;
+              {pecaParaDeletar?.nome}&quot;? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

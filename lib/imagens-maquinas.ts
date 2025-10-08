@@ -27,7 +27,7 @@ import teste from '@/assets/images/maquinas/teste.png';
 export type ImagemMaquina = {
   id: string;
   nome: string;
-  src: any;
+  src: string | import('next/image').StaticImageData;
   url: string;
 };
 

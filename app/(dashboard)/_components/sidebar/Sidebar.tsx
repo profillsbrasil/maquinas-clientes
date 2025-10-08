@@ -8,16 +8,7 @@ import { Button } from '@/components/ui/button';
 import { handleLogout } from '@/lib/auth-helpers';
 import iconeProfills from '@/public/icon.png';
 
-import {
-  Box,
-  Cog,
-  Home,
-  LogOut,
-  Plus,
-  Settings,
-  Users,
-  Wrench
-} from 'lucide-react';
+import { Box, Cog, Home, LogOut, Settings, Users, Wrench } from 'lucide-react';
 
 interface SidebarProps {
   session: {

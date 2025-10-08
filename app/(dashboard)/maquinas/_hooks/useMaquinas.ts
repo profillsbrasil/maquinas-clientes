@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -53,7 +51,6 @@ export function useMaquina(id: number) {
 // Hook para deletar máquina (com renderização otimista)
 export function useDeletarMaquina() {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   return useMutation({
     mutationFn: async (id: number) => {
@@ -72,9 +69,9 @@ export function useDeletarMaquina() {
       const previousMaquinas = queryClient.getQueryData(maquinasKeys.list());
 
       // Atualizar cache otimisticamente (remove a máquina)
-      queryClient.setQueryData(maquinasKeys.list(), (old: any) => {
+      queryClient.setQueryData(maquinasKeys.list(), (old: unknown) => {
         if (!old) return [];
-        return old.filter((m: any) => m.id !== id);
+        return (old as { id: number }[]).filter((m) => m.id !== id);
       });
 
       return { previousMaquinas };

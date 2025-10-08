@@ -8,6 +8,6 @@ export interface Peca {
 export interface Maquina {
   id: number;
   name: string;
-  image: any;
+  image: string | import('next/image').StaticImageData;
   pecas: Peca[];
 }

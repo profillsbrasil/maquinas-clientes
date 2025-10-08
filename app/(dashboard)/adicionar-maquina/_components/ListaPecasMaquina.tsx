@@ -84,8 +84,8 @@ function ListaPecasMaquina({ pecas, onRemover }: ListaPecasMaquinaProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Remover Peça</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja remover a peça "{pecaParaRemover?.nome}"?
-              Esta ação não pode ser desfeita.
+              Tem certeza que deseja remover a peça &quot;
+              {pecaParaRemover?.nome}&quot;? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

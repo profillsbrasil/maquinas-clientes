@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 
 import { usePathname, useRouter } from 'next/navigation';
 
-import { GridPatternBg } from '@/components/gridPatternBg';
 import { useSession } from '@/lib/auth-client';
 import { redirectIfNotAuthenticated } from '@/lib/auth-helpers';
 import QueryProvider from '@/lib/providers/QueryProvider';
