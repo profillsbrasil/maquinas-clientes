@@ -160,7 +160,7 @@ export async function criarMaquina(
       imagem
     });
 
-    revalidatePath('/suas-maquinas');
+    revalidatePath('/maquinas');
     revalidatePath('/adicionar-maquina');
 
     return {
@@ -186,7 +186,7 @@ export async function atualizarMaquina(
   try {
     await db.update(maquinas).set({ nome, imagem }).where(eq(maquinas.id, id));
 
-    revalidatePath('/suas-maquinas');
+    revalidatePath('/maquinas');
     revalidatePath('/adicionar-maquina');
 
     return {
@@ -238,7 +238,7 @@ export async function deletarMaquina(id: string): Promise<ActionResult> {
   try {
     await db.delete(maquinas).where(eq(maquinas.id, id));
 
-    revalidatePath('/suas-maquinas');
+    revalidatePath('/maquinas');
 
     return {
       success: true,

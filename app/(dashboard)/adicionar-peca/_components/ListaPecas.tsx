@@ -2,6 +2,16 @@
 
 import { useState } from 'react';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -39,19 +49,23 @@ type ListaPecasProps = {
 export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
   const [pecaParaEditar, setPecaParaEditar] = useState<PecaType | null>(null);
   const [dialogAberto, setDialogAberto] = useState(false);
+  const [pecaParaDeletar, setPecaParaDeletar] = useState<{
+    id: string;
+    nome: string;
+  } | null>(null);
 
-  async function handleDeletar(id: string, nome: string) {
-    if (!confirm(`Tem certeza que deseja deletar a peça "${nome}"?`)) {
-      return;
-    }
+  async function handleConfirmarDeletar() {
+    if (!pecaParaDeletar) return;
 
-    const result = await deletarPeca(id);
+    const result = await deletarPeca(pecaParaDeletar.id);
 
     if (result.success) {
       toast.success(result.message);
     } else {
       toast.error(result.message);
     }
+
+    setPecaParaDeletar(null);
   }
 
   function handleEditar(peca: PecaType) {
@@ -105,7 +119,9 @@ export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
                   variant='destructive'
                   size='sm'
                   className='border-none'
-                  onClick={() => handleDeletar(peca.id, peca.nome)}>
+                  onClick={() =>
+                    setPecaParaDeletar({ id: peca.id, nome: peca.nome })
+                  }>
                   <Trash2 className='h-4 w-4 text-white' />
                 </Button>
               </div>
@@ -128,6 +144,30 @@ export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
           />
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={!!pecaParaDeletar}
+        onOpenChange={(open) => !open && setPecaParaDeletar(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Deletar Peça</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja deletar a peça "{pecaParaDeletar?.nome}"?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className='rounded-sm'>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmarDeletar}
+              className='bg-red-600 hover:bg-red-700 rounded-sm'>
+              Deletar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

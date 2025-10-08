@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -21,7 +23,8 @@ import {
   SelectValue
 } from '@/components/ui/select';
 
-import { Plus, Store } from 'lucide-react';
+import { Plus, Store, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 type PecaType = {
   id: string;
@@ -55,7 +58,7 @@ export default function AdicionarPeca({
 
   function handleAdicionar() {
     if (!pecaSelecionada) {
-      alert('Selecione uma peça');
+      toast.error('Selecione uma peça');
       return;
     }
 
@@ -68,26 +71,24 @@ export default function AdicionarPeca({
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <span className='bg-green-600/30 border border-green-600 flex items-center justify-center text-xs p-1 text-white hover:bg-green-600/50 cursor-pointer'>
-            {pecaExistente.nome}
+          <span className='bg-green-600/30 border border-green-600 flex items-center justify-center text-xs  text-white hover:bg-green-600/50 cursor-pointer'>
+            <X className='size-4' />
           </span>
         </DialogTrigger>
         <DialogContent className='sm:max-w-md'>
           <DialogHeader>
             <DialogTitle>{pecaExistente.nome}</DialogTitle>
-            <DialogDescription>
-              Localização: Quadrado {localizacao}
-            </DialogDescription>
+            <DialogDescription>Quadrado {localizacao}</DialogDescription>
           </DialogHeader>
           <div className='flex flex-col gap-4'>
-            <a
+            <Link
               href={pecaExistente.linkLoja}
               target='_blank'
               rel='noopener noreferrer'
               className='flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800'>
               <Store className='w-4 h-4' />
-              Ver na Loja Integrada
-            </a>
+              Ver na Loja
+            </Link>
           </div>
           <DialogFooter>
             <DialogClose asChild>
@@ -104,23 +105,24 @@ export default function AdicionarPeca({
   return (
     <Dialog open={dialogAberto} onOpenChange={setDialogAberto}>
       <DialogTrigger asChild>
-        <span className='text-white group border hover:bg-slate-800/50 flex items-center justify-center'>
+        <span className='text-white group border hover:bg-slate-800/60 flex items-center justify-center'>
           <Plus className='w-4 h-4 text-transparent group-hover:text-white' />
         </span>
       </DialogTrigger>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Adicionar Uma Peça</DialogTitle>
-          <DialogDescription>
-            Localização: Quadrado {localizacao}
-          </DialogDescription>
+          <DialogDescription>Quadrado {localizacao}</DialogDescription>
         </DialogHeader>
         <div className='flex flex-col gap-4'>
           <Select value={pecaSelecionada} onValueChange={setPecaSelecionada}>
-            <SelectTrigger className='w-full'>
-              <SelectValue placeholder='Selecione a peça' />
+            <SelectTrigger className='w-full rounded-sm'>
+              <SelectValue
+                placeholder='Selecione a peça'
+                className='rounded-sm'
+              />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className='rounded-sm'>
               {pecasDisponiveis.map((peca) => (
                 <SelectItem key={peca.id} value={peca.id}>
                   {peca.nome}
@@ -130,23 +132,27 @@ export default function AdicionarPeca({
           </Select>
 
           {pecaAtual && (
-            <a
+            <Link
               href={pecaAtual.linkLojaIntegrada}
               target='_blank'
               rel='noopener noreferrer'
               className='flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800'>
               <Store className='w-4 h-4' />
               Ver na Loja Integrada
-            </a>
+            </Link>
           )}
         </div>
         <DialogFooter className='sm:justify-end '>
           <DialogClose asChild>
-            <Button type='button' variant='secondary'>
+            <Button type='button' variant='secondary' className='rounded-sm'>
               Cancelar
             </Button>
           </DialogClose>
-          <Button type='button' variant='default' onClick={handleAdicionar}>
+          <Button
+            type='button'
+            variant='default'
+            onClick={handleAdicionar}
+            className='rounded-sm'>
             Adicionar
           </Button>
         </DialogFooter>
