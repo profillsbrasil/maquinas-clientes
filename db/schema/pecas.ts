@@ -1,5 +1,10 @@
 import { sql } from 'drizzle-orm';
-import { customType, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import {
+  customType,
+  integer,
+  sqliteTable,
+  text
+} from 'drizzle-orm/sqlite-core';
 
 const timestamp = customType<{ data: Date; driverData: string }>({
   dataType() {
@@ -14,7 +19,7 @@ const timestamp = customType<{ data: Date; driverData: string }>({
 });
 
 export const pecas = sqliteTable('pecas', {
-  id: text('id').primaryKey(),
+  id: integer('id').primaryKey(),
   nome: text('nome').notNull(),
   linkLojaIntegrada: text('link_loja_integrada').notNull(),
   createdAt: timestamp('created_at')

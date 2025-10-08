@@ -6,7 +6,6 @@ import db from '@/db/connection';
 import { pecas } from '@/db/schema/pecas';
 
 import { eq } from 'drizzle-orm';
-import { nanoid } from 'nanoid';
 
 // Tipos para os retornos das actions
 type ActionResult<T = void> = {
@@ -15,6 +14,11 @@ type ActionResult<T = void> = {
   data?: T;
   errors?: Record<string, string[]>;
 };
+
+// Função para gerar ID de 8 dígitos
+function gerarId(): number {
+  return Math.floor(10000000 + Math.random() * 90000000);
+}
 
 // Action para listar todas as peças
 export async function listarPecas(): Promise<
@@ -65,7 +69,7 @@ export async function criarPeca(formData: FormData): Promise<ActionResult> {
 
     // Criar a peça
     await db.insert(pecas).values({
-      id: nanoid(),
+      id: gerarId(),
       nome: nome.trim(),
       linkLojaIntegrada: linkLojaIntegrada.trim()
     });
@@ -87,7 +91,7 @@ export async function criarPeca(formData: FormData): Promise<ActionResult> {
 
 // Action para editar uma peça existente
 export async function editarPeca(
-  id: string,
+  id: number,
   formData: FormData
 ): Promise<ActionResult> {
   try {
@@ -138,7 +142,7 @@ export async function editarPeca(
 }
 
 // Action para deletar uma peça
-export async function deletarPeca(id: string): Promise<ActionResult> {
+export async function deletarPeca(id: number): Promise<ActionResult> {
   try {
     await db.delete(pecas).where(eq(pecas.id, id));
 
@@ -159,7 +163,7 @@ export async function deletarPeca(id: string): Promise<ActionResult> {
 
 // Action para buscar uma peça específica
 export async function buscarPeca(
-  id: string
+  id: number
 ): Promise<ActionResult<typeof pecas.$inferSelect>> {
   try {
     const [peca] = await db.select().from(pecas).where(eq(pecas.id, id));

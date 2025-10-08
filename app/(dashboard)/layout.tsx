@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { GridPatternBg } from '@/components/gridPatternBg';
 import { useSession } from '@/lib/auth-client';
 import { redirectIfNotAuthenticated } from '@/lib/auth-helpers';
+import QueryProvider from '@/lib/providers/QueryProvider';
 
 import Header from './_components/sidebar/Header';
 import Sidebar from './_components/sidebar/Sidebar';
@@ -49,20 +50,22 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className='flex min-h-screen'>
-      <Sidebar
-        session={session}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-      />
-      <div className='flex-1 flex flex-col  '>
-        <Header
+    <QueryProvider>
+      <div className='flex min-h-screen'>
+        <Sidebar
+          session={session}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
-          title={pageTitle}
         />
-        <div className='pt-16 flex-1'>{children}</div>
+        <div className='flex-1 flex flex-col  '>
+          <Header
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            title={pageTitle}
+          />
+          <div className='pt-16 flex-1'>{children}</div>
+        </div>
       </div>
-    </div>
+    </QueryProvider>
   );
 }

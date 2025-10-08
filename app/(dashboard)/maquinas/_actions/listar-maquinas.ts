@@ -1,5 +1,7 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
+
 import db from '@/db/connection';
 import { maquinas } from '@/db/schema/maquinas';
 import { pecas } from '@/db/schema/pecas';
@@ -13,54 +15,24 @@ type ActionResult<T = void> = {
   data?: T;
 };
 
-type MaquinaComPecas = {
-  id: string;
-  nome: string;
-  imagem: string;
-  criadoEm: Date;
-  alteradoEm: Date;
-  totalPecas: number;
-};
-
-type PecaNaMaquina = {
-  id: string;
-  pecaId: string;
-  nome: string;
-  linkLojaIntegrada: string;
-  localizacao: number;
-};
-
-type MaquinaDetalhada = {
-  id: string;
-  nome: string;
-  imagem: string;
-  criadoEm: Date;
-  alteradoEm: Date;
-  pecas: PecaNaMaquina[];
-};
-
-// Listar todas as máquinas com contagem de peças
-export async function listarTodasMaquinas(): Promise<
-  ActionResult<MaquinaComPecas[]>
-> {
+// Lista todas as máquinas com count de peças
+// Query otimizada: busca APENAS os campos necessários
+export async function listarMaquinas() {
   try {
     const resultado = await db
       .select({
         id: maquinas.id,
         nome: maquinas.nome,
-        imagem: maquinas.imagem,
-        criadoEm: maquinas.criadoEm,
-        alteradoEm: maquinas.alteradoEm,
-        totalPecas: sql<number>`count(${pecasNaMaquina.id})`
+        imagem: maquinas.imagem, // URL da imagem (não base64)
+        totalPecas: sql<number>`cast(count(${pecasNaMaquina.id}) as int)`
       })
       .from(maquinas)
       .leftJoin(pecasNaMaquina, eq(maquinas.id, pecasNaMaquina.maquinaId))
       .groupBy(maquinas.id)
-      .orderBy(maquinas.criadoEm);
+      .orderBy(maquinas.nome); // Ordenar por nome é mais útil
 
     return {
       success: true,
-      message: 'Máquinas carregadas com sucesso',
       data: resultado
     };
   } catch (error) {
@@ -73,51 +45,37 @@ export async function listarTodasMaquinas(): Promise<
   }
 }
 
-// Buscar máquina por ID com suas peças
-export async function buscarMaquinaPorId(
-  id: string
-): Promise<ActionResult<MaquinaDetalhada>> {
+// Busca uma máquina com suas peças
+export async function buscarMaquina(id: number) {
   try {
-    // Buscar a máquina
-    const maquina = await db
-      .select()
-      .from(maquinas)
-      .where(eq(maquinas.id, id))
-      .limit(1);
+    const [maquinaResult, pecasResult] = await Promise.all([
+      db.select().from(maquinas).where(eq(maquinas.id, id)).limit(1),
+      db
+        .select({
+          id: pecasNaMaquina.id,
+          pecaId: pecasNaMaquina.pecaId,
+          nome: pecas.nome,
+          linkLojaIntegrada: pecas.linkLojaIntegrada,
+          localizacao: pecasNaMaquina.localizacao
+        })
+        .from(pecasNaMaquina)
+        .innerJoin(pecas, eq(pecasNaMaquina.pecaId, pecas.id))
+        .where(eq(pecasNaMaquina.maquinaId, id))
+    ]);
 
-    if (!maquina || maquina.length === 0) {
+    if (!maquinaResult || maquinaResult.length === 0) {
       return {
         success: false,
         message: 'Máquina não encontrada'
       };
     }
 
-    // Buscar as peças da máquina
-    const pecasDaMaquina = await db
-      .select({
-        id: pecasNaMaquina.id,
-        pecaId: pecasNaMaquina.pecaId,
-        nome: pecas.nome,
-        linkLojaIntegrada: pecas.linkLojaIntegrada,
-        localizacao: pecasNaMaquina.localizacao
-      })
-      .from(pecasNaMaquina)
-      .innerJoin(pecas, eq(pecasNaMaquina.pecaId, pecas.id))
-      .where(eq(pecasNaMaquina.maquinaId, id));
-
-    const maquinaDetalhada: MaquinaDetalhada = {
-      id: maquina[0].id,
-      nome: maquina[0].nome,
-      imagem: maquina[0].imagem,
-      criadoEm: maquina[0].criadoEm,
-      alteradoEm: maquina[0].alteradoEm,
-      pecas: pecasDaMaquina
-    };
-
     return {
       success: true,
-      message: 'Máquina carregada com sucesso',
-      data: maquinaDetalhada
+      data: {
+        ...maquinaResult[0],
+        pecas: pecasResult
+      }
     };
   } catch (error) {
     console.error('Erro ao buscar máquina:', error);
@@ -128,10 +86,12 @@ export async function buscarMaquinaPorId(
   }
 }
 
-// Deletar máquina
-export async function deletarMaquina(id: string): Promise<ActionResult> {
+// Deleta uma máquina
+export async function deletarMaquina(id: number): Promise<ActionResult> {
   try {
     await db.delete(maquinas).where(eq(maquinas.id, id));
+
+    revalidatePath('/maquinas');
 
     return {
       success: true,

@@ -11,7 +11,7 @@ import { useFormStatus } from 'react-dom';
 import { toast } from 'sonner';
 
 type PecaType = {
-  id: string;
+  id: number;
   nome: string;
   linkLojaIntegrada: string;
 };

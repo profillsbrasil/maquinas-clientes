@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 
@@ -12,47 +12,37 @@ import {
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-import {
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  Headset,
-  Settings,
-  Store
-} from 'lucide-react';
+import { ChevronLeft, Eye, Headset, Settings, Store } from 'lucide-react';
 
 type Peca = {
-  id: string;
-  pecaId: string;
+  id: number;
+  pecaId: number;
   nome: string;
   linkLojaIntegrada: string;
   localizacao: number;
 };
 
-type MaquinaVisualizarProps = {
+type Props = {
   maquina: {
-    id: string;
+    id: number;
     nome: string;
     imagem: string;
     pecas: Peca[];
   };
 };
 
-export default function MaquinaVisualizar({ maquina }: MaquinaVisualizarProps) {
-  const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
+export default function MaquinaVisualizar({ maquina }: Props) {
+  const [popoverAberto, setPopoverAberto] = useState<number | null>(null);
 
-  const handleTogglePopover = (index: number) => {
-    setOpenPopoverIndex(openPopoverIndex === index ? null : index);
-  };
-
-  // Criar um mapa de localização para peças
-  const pecasPorLocalizacao = new Map(
-    maquina.pecas.map((peca) => [peca.localizacao, peca])
+  const pecasPorLocalizacao = useMemo(
+    () => new Map(maquina.pecas.map((peca) => [peca.localizacao, peca])),
+    [maquina.pecas]
   );
 
   return (
     <div className='mx-auto h-[calc(100vh-64px)] w-full flex flex-col'>
       <div className='flex gap-4 w-full flex-1 justify-evenly overflow-hidden'>
+        {/* Área da imagem */}
         <div className='relative w-1/2 h-full flex items-center justify-center p-4'>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -60,7 +50,8 @@ export default function MaquinaVisualizar({ maquina }: MaquinaVisualizarProps) {
             alt={maquina.nome}
             className='w-full h-full object-contain'
           />
-          {/* Grid de localizações */}
+
+          {/* Grid de peças */}
           <div className='absolute top-0 left-0 w-full h-full grid grid-cols-30 p-4 pointer-events-none'>
             {Array.from({ length: 600 }).map((_, index) => {
               const peca = pecasPorLocalizacao.get(index);
@@ -76,9 +67,9 @@ export default function MaquinaVisualizar({ maquina }: MaquinaVisualizarProps) {
                   key={index}
                   className='flex items-center justify-center pointer-events-auto'>
                   <Popover
-                    open={openPopoverIndex === pecaIndex}
+                    open={popoverAberto === pecaIndex}
                     onOpenChange={(open) =>
-                      setOpenPopoverIndex(open ? pecaIndex : null)
+                      setPopoverAberto(open ? pecaIndex : null)
                     }>
                     <PopoverTrigger className='h-8 min-w-8 flex justify-center items-center z-10 rounded-full bg-slate-800/40 text-white hover:bg-slate-800/90 transition-colors'>
                       <Eye className='size-5' />
@@ -100,11 +91,12 @@ export default function MaquinaVisualizar({ maquina }: MaquinaVisualizarProps) {
           </div>
         </div>
 
-        <div className='flex flex-col  w-[30rem] pt-30 justify-start items-start'>
+        {/* Lista de peças */}
+        <div className='flex flex-col w-[30rem] pt-30 justify-start items-start'>
           <div className='flex flex-col py-4 w-full justify-start items-start'>
             <h2 className='text-2xl font-bold'>Lista de Peças</h2>
             <p className='text-muted-foreground'>
-              Peças presentes na sua máquina ({maquina.pecas.length})
+              Peças presentes na máquina ({maquina.pecas.length})
             </p>
           </div>
           <ScrollArea className='max-h-100 max-w-[30rem] min-w-[20rem] p-4 bg-slate-800 text-white rounded-sm'>
@@ -117,9 +109,11 @@ export default function MaquinaVisualizar({ maquina }: MaquinaVisualizarProps) {
                 maquina.pecas.map((peca, index) => (
                   <Button
                     key={peca.id}
-                    onClick={() => handleTogglePopover(index)}
+                    onClick={() =>
+                      setPopoverAberto(popoverAberto === index ? null : index)
+                    }
                     className={`flex items-center gap-2 w-full justify-start hover:bg-slate-700 hover:text-white ${
-                      openPopoverIndex === index ? 'bg-slate-700' : ''
+                      popoverAberto === index ? 'bg-slate-700' : ''
                     }`}
                     variant='ghost'>
                     <Settings className='w-4 h-4' />
@@ -132,6 +126,7 @@ export default function MaquinaVisualizar({ maquina }: MaquinaVisualizarProps) {
         </div>
       </div>
 
+      {/* Rodapé */}
       <div className='w-full relative h-14 bg-slate-900 flex items-center justify-between'>
         <div className='flex w-1/2 items-center justify-center h-full gap-10'>
           <Link
@@ -150,11 +145,11 @@ export default function MaquinaVisualizar({ maquina }: MaquinaVisualizarProps) {
         <div className='flex w-1/2 h-full justify-end items-center'>
           <Button
             variant='outline'
-            // TODO: Colocar a função de solicitar auxílio whatsapp
             onClick={() => {
+              // TODO: Integrar WhatsApp
               alert('Solicitar Auxílio');
             }}
-            className='h-14 min-w-48 rounded-none hover:bg-slate-700/90 hover:text-white  border-x bg-slate-800  text-white border-border/10'>
+            className='h-14 min-w-48 rounded-none hover:bg-slate-700/90 hover:text-white border-x bg-slate-800 text-white border-border/10'>
             <Headset className='w-4 h-4 mr-2' /> Solicitar Auxílio
           </Button>
         </div>

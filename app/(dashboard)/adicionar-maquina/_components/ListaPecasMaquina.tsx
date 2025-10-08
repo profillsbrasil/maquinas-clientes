@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 import {
   AlertDialog,
@@ -19,7 +19,7 @@ import { Trash2 } from 'lucide-react';
 
 type PecaLocalType = {
   localizacao: number;
-  pecaId: string;
+  pecaId: number;
   nome: string;
   linkLoja: string;
 };
@@ -29,10 +29,7 @@ type ListaPecasMaquinaProps = {
   onRemover: (localizacao: number) => void;
 };
 
-export default function ListaPecasMaquina({
-  pecas,
-  onRemover
-}: ListaPecasMaquinaProps) {
+function ListaPecasMaquina({ pecas, onRemover }: ListaPecasMaquinaProps) {
   const [pecaParaRemover, setPecaParaRemover] = useState<{
     localizacao: number;
     nome: string;
@@ -112,3 +109,6 @@ export default function ListaPecasMaquina({
     </>
   );
 }
+
+// Memoizar para evitar re-renders desnecessários
+export default memo(ListaPecasMaquina);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,129 +10,147 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 
-import { criarMaquina, listarPecasDisponiveis } from './_actions/maquinas';
+import { useInvalidarMaquinas } from '../maquinas/_hooks/useMaquinas';
+import {
+  criarMaquinaCompleta,
+  listarPecasDisponiveis
+} from './_actions/maquinas';
 import AdicionarPeca from './_components/AdicionarPeca';
 import ListaPecasMaquina from './_components/ListaPecasMaquina';
-import { ChevronLeft, ImageIcon, ImageUp, Save, Upload, X } from 'lucide-react';
+import { ChevronLeft, ImageIcon, ImageUp, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
-type PecaType = {
-  id: string;
+type Peca = {
+  id: number;
   nome: string;
   linkLojaIntegrada: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
-type PecaLocalType = {
+type PecaAdicionada = {
   localizacao: number;
-  pecaId: string;
+  pecaId: number;
   nome: string;
   linkLoja: string;
 };
 
 export default function AdicionarMaquinaPage() {
   const router = useRouter();
+  const invalidarMaquinas = useInvalidarMaquinas();
 
-  // Estado da imagem (preview)
-  const [imagemMaquina, setImagemMaquina] = useState('');
-  const [imagemSelecionada, setImagemSelecionada] = useState(false);
-  const [nomeArquivo, setNomeArquivo] = useState('');
-
-  // Estado do nome (no rodapé)
-  const [nomeMaquina, setNomeMaquina] = useState('');
-
-  // Estado das peças
-  const [pecasDisponiveis, setPecasDisponiveis] = useState<PecaType[]>([]);
-  const [pecasAdicionadas, setPecasAdicionadas] = useState<PecaLocalType[]>([]);
+  // Estados essenciais
+  const [imagem, setImagem] = useState<{ url: string; nome: string } | null>(
+    null
+  );
+  const [nome, setNome] = useState('');
+  const [pecas, setPecas] = useState<Peca[]>([]);
+  const [pecasAdicionadas, setPecasAdicionadas] = useState<PecaAdicionada[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [salvando, setSalvando] = useState(false);
 
+  // Carregar peças disponíveis
   useEffect(() => {
-    carregarPecasDisponiveis();
+    async function carregar() {
+      const result = await listarPecasDisponiveis();
+      setPecas(result.data || []);
+      setLoading(false);
+    }
+    carregar();
   }, []);
 
-  async function carregarPecasDisponiveis() {
-    setLoading(true);
-    const pecasResult = await listarPecasDisponiveis();
-    setPecasDisponiveis(pecasResult.data || []);
-    setLoading(false);
-  }
+  // Upload de imagem via API
+  const handleUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-  function handleUploadImagem(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        toast.error('Selecione uma imagem válida');
+        return;
+      }
 
-    // Verificar se é imagem
-    if (!file.type.startsWith('image/')) {
-      toast.error('Por favor, selecione uma imagem válida');
-      return;
-    }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Imagem muito grande (máx 10MB)');
+        return;
+      }
 
-    // Verificar tamanho (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Imagem muito grande. Máximo 5MB');
-      return;
-    }
+      const loadingToast = toast.loading('Fazendo upload...');
 
-    // Criar preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
-      setImagemMaquina(result);
-      setImagemSelecionada(true);
-      setNomeArquivo(file.name);
-      toast.success('Imagem carregada!');
-    };
-    reader.readAsDataURL(file);
-  }
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
 
-  function handleRemoverImagem() {
-    setImagemMaquina('');
-    setImagemSelecionada(false);
-    setNomeArquivo('');
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Erro no upload');
+        }
+
+        setImagem({ url: data.url, nome: file.name });
+        toast.dismiss(loadingToast);
+        toast.success('Imagem carregada!');
+      } catch (error) {
+        toast.dismiss(loadingToast);
+        toast.error(error instanceof Error ? error.message : 'Erro no upload');
+        console.error('Erro:', error);
+      }
+    },
+    []
+  );
+
+  const handleRemoverImagem = useCallback(() => {
+    setImagem(null);
     setPecasAdicionadas([]);
-  }
+  }, []);
 
-  function handleAdicionarPeca(localizacao: number, pecaId: string) {
-    const peca = pecasDisponiveis.find((p) => p.id === pecaId);
-    if (!peca) return;
+  const handleAdicionarPeca = useCallback(
+    (localizacao: number, pecaId: number) => {
+      const peca = pecas.find((p) => p.id === pecaId);
+      if (!peca) return;
 
-    // Verificar se já existe peça nessa localização
-    const jaExiste = pecasAdicionadas.some(
-      (p) => p.localizacao === localizacao
-    );
-    if (jaExiste) {
-      toast.error('Já existe uma peça nesta localização');
-      return;
-    }
+      if (pecasAdicionadas.some((p) => p.localizacao === localizacao)) {
+        toast.error('Já existe peça nesta localização');
+        return;
+      }
 
-    const novaPeca: PecaLocalType = {
-      localizacao,
-      pecaId: peca.id,
-      nome: peca.nome,
-      linkLoja: peca.linkLojaIntegrada
-    };
+      setPecasAdicionadas([
+        ...pecasAdicionadas,
+        {
+          localizacao,
+          pecaId: peca.id,
+          nome: peca.nome,
+          linkLoja: peca.linkLojaIntegrada
+        }
+      ]);
+      toast.success('Peça adicionada!');
+    },
+    [pecas, pecasAdicionadas]
+  );
 
-    setPecasAdicionadas([...pecasAdicionadas, novaPeca]);
-    toast.success('Peça adicionada!');
-  }
+  const handleRemoverPeca = useCallback(
+    (localizacao: number) => {
+      setPecasAdicionadas(
+        pecasAdicionadas.filter((p) => p.localizacao !== localizacao)
+      );
+      toast.success('Peça removida!');
+    },
+    [pecasAdicionadas]
+  );
 
-  function handleRemoverPeca(localizacao: number) {
-    setPecasAdicionadas(
-      pecasAdicionadas.filter((p) => p.localizacao !== localizacao)
-    );
-    toast.success('Peça removida!');
-  }
-
-  async function handleSalvarMaquina() {
-    if (!nomeMaquina.trim()) {
+  const handleSalvar = useCallback(async () => {
+    if (!nome.trim()) {
       toast.error('Digite o nome da máquina');
       return;
     }
 
-    if (!imagemMaquina) {
-      toast.error('Selecione uma imagem para a máquina');
+    if (!imagem) {
+      toast.error('Selecione uma imagem');
       return;
     }
 
@@ -144,41 +162,37 @@ export default function AdicionarMaquinaPage() {
     setSalvando(true);
 
     try {
-      // Criar a máquina no banco
-      const maquinaResult = await criarMaquina(nomeMaquina, imagemMaquina);
+      const result = await criarMaquinaCompleta(
+        nome,
+        imagem.url,
+        pecasAdicionadas.map((p) => ({
+          pecaId: p.pecaId,
+          localizacao: p.localizacao
+        }))
+      );
 
-      if (!maquinaResult.success || !maquinaResult.data?.id) {
-        toast.error(maquinaResult.message);
+      if (!result.success) {
+        toast.error(result.message);
         setSalvando(false);
         return;
       }
 
-      const maquinaId = maquinaResult.data.id;
+      // Invalidar cache para refletir a nova máquina
+      invalidarMaquinas();
 
-      // Adicionar todas as peças usando a action
-      const { adicionarPecaNaMaquina } = await import('./_actions/maquinas');
-
-      for (const peca of pecasAdicionadas) {
-        await adicionarPecaNaMaquina(maquinaId, peca.pecaId, peca.localizacao);
-      }
-
-      toast.success('Máquina salva com sucesso!');
-
-      // Redirecionar para a lista de máquinas
-      setTimeout(() => {
-        router.push('/maquinas');
-      }, 1000);
+      toast.success('Máquina criada com sucesso!');
+      setTimeout(() => router.push('/maquinas'), 800);
     } catch (error) {
-      console.error('Erro ao salvar:', error);
+      console.error('Erro:', error);
       toast.error('Erro ao salvar máquina');
-    } finally {
       setSalvando(false);
     }
-  }
+  }, [nome, imagem, pecasAdicionadas, router, invalidarMaquinas]);
 
-  // Mapear peças por localização
-  const pecasPorLocalizacao = new Map(
-    pecasAdicionadas.map((p) => [p.localizacao, p])
+  // Mapa de peças por localização
+  const pecasPorLocalizacao = useMemo(
+    () => new Map(pecasAdicionadas.map((p) => [p.localizacao, p])),
+    [pecasAdicionadas]
   );
 
   if (loading) {
@@ -192,33 +206,32 @@ export default function AdicionarMaquinaPage() {
     );
   }
 
-  // Se não fez upload da imagem ainda, mostrar tela de upload
-  if (!imagemSelecionada) {
+  // Tela de upload
+  if (!imagem) {
     return (
       <div className='flex-1 h-full w-full flex flex-col items-center justify-center gap-6 p-8'>
         <div className='flex flex-col items-center gap-4'>
-          <h1 className='text-3xl font-bold '>Adicionar Nova Máquina</h1>
+          <h1 className='text-3xl font-bold'>Adicionar Nova Máquina</h1>
           <p className='text-muted-foreground text-center max-w-md'>
-            Faça upload da imagem da máquina. Ela será usada como base para você
-            adicionar as peças.
+            Faça upload da imagem da máquina para começar
           </p>
         </div>
 
         <div className='flex flex-col gap-4 w-full max-w-md'>
           <Label
             htmlFor='upload-imagem'
-            className='w-full h-32 border-2 border-dashed group border-slate-600 rounded-sm flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-blue-500  transition-colors'>
+            className='w-full h-32 border-2 border-dashed group border-slate-600 rounded-sm flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-blue-500 transition-colors'>
             <ImageIcon className='w-12 h-12 text-slate-400 group-hover:text-blue-500' />
-            <span className=' font-medium'>Clique para fazer upload</span>
+            <span className='font-medium'>Clique para fazer upload</span>
             <span className='text-xs text-muted-foreground'>
-              PNG, JPG, WEBP (máx. 5MB)
+              PNG, JPG, WEBP (máx. 10MB)
             </span>
           </Label>
           <Input
             id='upload-imagem'
             type='file'
             accept='image/*'
-            onChange={handleUploadImagem}
+            onChange={handleUpload}
             className='hidden'
           />
         </div>
@@ -226,8 +239,8 @@ export default function AdicionarMaquinaPage() {
         <Link href='/maquinas'>
           <Button
             variant='outline'
-            className='mt-3 w-48 rounded-sm flex  gap-2 items-center justify-center bg-slate-800 text-white hover:bg-slate-700 hover:text-white border-slate-600'>
-            <ChevronLeft className='w-4 h-4 ' />
+            className='mt-3 w-48 rounded-sm flex gap-2 items-center justify-center bg-slate-800 text-white hover:bg-slate-700 hover:text-white border-slate-600'>
+            <ChevronLeft className='w-4 h-4' />
             Voltar
           </Button>
         </Link>
@@ -235,27 +248,28 @@ export default function AdicionarMaquinaPage() {
     );
   }
 
-  // Tela principal com imagem e grid
+  // Tela principal
   return (
     <div className='flex-1 h-full w-full'>
       <div className='mx-auto h-[calc(100vh-64px)] w-full flex flex-col'>
         <div className='flex gap-4 w-full flex-1 justify-evenly overflow-hidden'>
-          {/* Área da imagem com grid */}
+          {/* Área da imagem */}
           <div className='relative w-1/2 flex items-center justify-center p-4'>
-            {/* Botão para trocar imagem */}
             <Button
               onClick={handleRemoverImagem}
-              className='absolute h-10 w-40 top-4 right-4 bg-slate-800 rounded-none z-10  '>
+              className='absolute h-10 w-40 top-4 right-4 bg-slate-800 rounded-none z-10'>
               <ImageUp className='size-5 text-white' />
               <span className='text-white'>Trocar Imagem</span>
             </Button>
 
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={imagemMaquina}
+              src={imagem.url}
               alt='Preview da máquina'
               className='w-full h-full object-contain'
             />
+
+            {/* Grid de localizações */}
             <div className='absolute top-0 left-0 w-full h-full grid grid-cols-30 hover:cursor-pointer p-4'>
               {Array.from({ length: 600 }).map((_, index) => {
                 const pecaExistente = pecasPorLocalizacao.get(index);
@@ -263,7 +277,7 @@ export default function AdicionarMaquinaPage() {
                   <AdicionarPeca
                     key={index}
                     localizacao={index}
-                    pecasDisponiveis={pecasDisponiveis}
+                    pecasDisponiveis={pecas}
                     pecaExistente={
                       pecaExistente
                         ? {
@@ -281,27 +295,23 @@ export default function AdicionarMaquinaPage() {
           </div>
 
           {/* Lista de peças */}
-          <div className='flex flex-col  w-[30rem] pt-30 justify-start items-center'>
-            {/* Info da imagem */}
+          <div className='flex flex-col w-[30rem] pt-30 justify-start items-center'>
             <div className='w-full p-3 bg-slate-800 rounded-sm border border-slate-700'>
               <div className='flex items-center gap-2 text-sm'>
                 <ImageIcon className='w-4 h-4 text-blue-400' />
                 <span className='text-white font-medium truncate'>
-                  {nomeArquivo} -
-                </span>
-                <span className='text-slate-300'>
-                  {nomeArquivo.split('.')[1].toUpperCase()}
+                  {imagem.nome}
                 </span>
               </div>
             </div>
 
             <div className='flex flex-col py-4 w-full justify-start items-start'>
-              <h2 className='text-2xl font-bold '>Lista de Peças</h2>
+              <h2 className='text-2xl font-bold'>Lista de Peças</h2>
               <p className='text-muted-foreground'>
-                Clique nos quadrados para adicionar peças (
-                {pecasAdicionadas.length})
+                Clique nos quadrados para adicionar ({pecasAdicionadas.length})
               </p>
             </div>
+
             <ListaPecasMaquina
               pecas={pecasAdicionadas}
               onRemover={handleRemoverPeca}
@@ -309,14 +319,14 @@ export default function AdicionarMaquinaPage() {
           </div>
         </div>
 
-        {/* Rodapé com ações */}
-        <div className='w-full h-14 bg-slate-900 flex items-center justify-between  '>
+        {/* Rodapé */}
+        <div className='w-full h-14 bg-slate-900 flex items-center justify-between'>
           <div className='flex items-center gap-4'>
             <Button
               variant='outline'
-              className='h-14 border-r rounded-none hover:bg-slate-700/90 border-border/10  bg-slate-800 '
+              className='h-14 border-r rounded-none hover:bg-slate-700/90 border-border/10 bg-slate-800'
               onClick={() => router.push('/maquinas')}>
-              <ChevronLeft className='size-5 text-white ' />
+              <ChevronLeft className='size-5 text-white' />
             </Button>
 
             <div className='flex items-center gap-3'>
@@ -325,19 +335,17 @@ export default function AdicionarMaquinaPage() {
               </label>
               <Input
                 type='text'
-                value={nomeMaquina}
-                onChange={(e) => setNomeMaquina(e.target.value)}
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
                 placeholder='Ex: TP85'
-                className='h-14 w-64 focus-visible:border-border/30 border-x bg-slate-800 border-border/10  text-white rounded-none placeholder:text-slate-400'
+                className='h-14 w-64 focus-visible:border-border/30 border-x bg-slate-800 border-border/10 text-white rounded-none placeholder:text-slate-400'
               />
             </div>
           </div>
 
           <Button
-            onClick={handleSalvarMaquina}
-            disabled={
-              salvando || !nomeMaquina.trim() || pecasAdicionadas.length === 0
-            }
+            onClick={handleSalvar}
+            disabled={salvando || !nome.trim() || pecasAdicionadas.length === 0}
             className='h-14 min-w-48 bg-green-600 border-none rounded-none hover:bg-green-700 text-white disabled:opacity-50'>
             {salvando ? (
               <>

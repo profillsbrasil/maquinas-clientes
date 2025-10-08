@@ -35,7 +35,7 @@ import { Edit, Store, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 type PecaType = {
-  id: string;
+  id: number;
   nome: string;
   linkLojaIntegrada: string;
   createdAt: Date;
@@ -50,7 +50,7 @@ export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
   const [pecaParaEditar, setPecaParaEditar] = useState<PecaType | null>(null);
   const [dialogAberto, setDialogAberto] = useState(false);
   const [pecaParaDeletar, setPecaParaDeletar] = useState<{
-    id: string;
+    id: number;
     nome: string;
   } | null>(null);
 

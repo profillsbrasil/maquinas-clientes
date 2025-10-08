@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 import Link from 'next/link';
 
@@ -27,13 +27,13 @@ import { Plus, Store, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 type PecaType = {
-  id: string;
+  id: number;
   nome: string;
   linkLojaIntegrada: string;
 };
 
 type PecaNaMaquinaLocal = {
-  pecaId: string;
+  pecaId: number;
   nome: string;
   linkLoja: string;
 };
@@ -42,10 +42,10 @@ type AdicionarPecaProps = {
   localizacao: number;
   pecasDisponiveis: PecaType[];
   pecaExistente?: PecaNaMaquinaLocal | null;
-  onAdicionar: (localizacao: number, pecaId: string) => void;
+  onAdicionar: (localizacao: number, pecaId: number) => void;
 };
 
-export default function AdicionarPeca({
+function AdicionarPeca({
   localizacao,
   pecasDisponiveis,
   pecaExistente,
@@ -54,7 +54,9 @@ export default function AdicionarPeca({
   const [pecaSelecionada, setPecaSelecionada] = useState<string>('');
   const [dialogAberto, setDialogAberto] = useState(false);
 
-  const pecaAtual = pecasDisponiveis.find((p) => p.id === pecaSelecionada);
+  const pecaAtual = pecasDisponiveis.find(
+    (p) => p.id.toString() === pecaSelecionada
+  );
 
   function handleAdicionar() {
     if (!pecaSelecionada) {
@@ -62,7 +64,7 @@ export default function AdicionarPeca({
       return;
     }
 
-    onAdicionar(localizacao, pecaSelecionada);
+    onAdicionar(localizacao, parseInt(pecaSelecionada, 10));
     setDialogAberto(false);
     setPecaSelecionada('');
   }
@@ -124,7 +126,7 @@ export default function AdicionarPeca({
             </SelectTrigger>
             <SelectContent className='rounded-sm'>
               {pecasDisponiveis.map((peca) => (
-                <SelectItem key={peca.id} value={peca.id}>
+                <SelectItem key={peca.id.toString()} value={peca.id.toString()}>
                   {peca.nome}
                 </SelectItem>
               ))}
@@ -160,3 +162,6 @@ export default function AdicionarPeca({
     </Dialog>
   );
 }
+
+// Memoizar para evitar re-renders quando props não mudam
+export default memo(AdicionarPeca);
