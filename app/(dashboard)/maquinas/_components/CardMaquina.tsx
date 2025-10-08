@@ -101,7 +101,7 @@ export default function CardMaquina({ id, nome, imagem, totalPecas }: Props) {
               variant='outline'
               onClick={(e) => {
                 e.stopPropagation();
-                router.push(`/editar-maquina/${id}`);
+                router.push(`/maquinas/editar-maquina/${id}`);
               }}
               className='flex-1 bg-slate-700 rounded-sm text-white hover:bg-slate-700/90 hover:text-white'>
               <Edit className='w-4 h-4 mr-2' />

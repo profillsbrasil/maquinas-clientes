@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/select';
 
 import type { Peca, PecaAdicionada } from '../_types';
-import { Plus, Store, X } from 'lucide-react';
+import { Plus, Store, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 type AdicionarPecaProps = {
@@ -32,13 +32,15 @@ type AdicionarPecaProps = {
   pecasDisponiveis: Peca[];
   pecaExistente?: Omit<PecaAdicionada, 'localizacao' | 'pecaId'> | null;
   onAdicionar: (localizacao: number, pecaId: number) => void;
+  onRemover?: (localizacao: number) => void;
 };
 
 function AdicionarPeca({
   localizacao,
   pecasDisponiveis,
   pecaExistente,
-  onAdicionar
+  onAdicionar,
+  onRemover
 }: AdicionarPecaProps) {
   const [pecaSelecionada, setPecaSelecionada] = useState<string>('');
   const [dialogAberto, setDialogAberto] = useState(false);
@@ -58,9 +60,16 @@ function AdicionarPeca({
     setPecaSelecionada('');
   }
 
+  function handleRemover() {
+    if (onRemover) {
+      onRemover(localizacao);
+      setDialogAberto(false);
+    }
+  }
+
   if (pecaExistente) {
     return (
-      <Dialog>
+      <Dialog open={dialogAberto} onOpenChange={setDialogAberto}>
         <DialogTrigger asChild>
           <span className='bg-green-600/30 border border-green-600 flex items-center justify-center text-xs  text-white hover:bg-green-600/50 cursor-pointer'>
             <X className='size-4' />
@@ -81,12 +90,22 @@ function AdicionarPeca({
               Ver na Loja
             </Link>
           </div>
-          <DialogFooter>
+          <DialogFooter className='flex gap-2'>
             <DialogClose asChild>
-              <Button type='button' variant='secondary'>
+              <Button type='button' variant='secondary' className='rounded-sm'>
                 Fechar
               </Button>
             </DialogClose>
+            {onRemover && (
+              <Button
+                type='button'
+                variant='destructive'
+                onClick={handleRemover}
+                className='rounded-sm bg-red-600 hover:bg-red-700'>
+                <Trash2 className='w-4 h-4 mr-2' />
+                Remover Peça
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

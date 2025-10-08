@@ -8,7 +8,16 @@ import { Button } from '@/components/ui/button';
 import { handleLogout } from '@/lib/auth-helpers';
 import iconeProfills from '@/public/icon.png';
 
-import { Box, Home, LogOut, Plus, Settings, Users } from 'lucide-react';
+import {
+  Box,
+  Cog,
+  Home,
+  LogOut,
+  Plus,
+  Settings,
+  Users,
+  Wrench
+} from 'lucide-react';
 
 interface SidebarProps {
   session: {
@@ -102,7 +111,7 @@ export default function Sidebar({ session, sidebarOpen }: SidebarProps) {
                   : ''
               } ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
               onClick={() => router.push('/adicionar-maquina')}>
-              <Plus className='size-4' />
+              <Cog className='size-4' />
               {sidebarOpen && (
                 <span className='font-medium'>Adicionar Máquina</span>
               )}
@@ -115,7 +124,7 @@ export default function Sidebar({ session, sidebarOpen }: SidebarProps) {
                   : ''
               } ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
               onClick={() => router.push('/adicionar-peca')}>
-              <Plus className='size-4' />
+              <Wrench className='size-4' />
               {sidebarOpen && (
                 <span className='font-medium'>Adicionar Peça</span>
               )}

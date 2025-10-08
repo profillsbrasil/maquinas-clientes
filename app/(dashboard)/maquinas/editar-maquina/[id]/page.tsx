@@ -1,56 +1,133 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import AdicionarPeca from '@/app/(dashboard)/adicionar-maquina/_components/AdicionarPeca';
+import ListaPecasMaquina from '@/app/(dashboard)/adicionar-maquina/_components/ListaPecasMaquina';
+import { usePecasDisponiveis } from '@/app/(dashboard)/adicionar-maquina/_hooks/usePecasDisponiveis';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 
-import AdicionarPeca from './_components/AdicionarPeca';
-import ListaPecasMaquina from './_components/ListaPecasMaquina';
-import { useCriarMaquina } from './_hooks/useCriarMaquina';
-import { usePecasAdicionadas } from './_hooks/usePecasAdicionadas';
-import { usePecasDisponiveis } from './_hooks/usePecasDisponiveis';
-import { useUploadImagem } from './_hooks/useUploadImagem';
+import { useMaquina } from '../../_hooks/useMaquinas';
+import { useEditarMaquina } from './_hooks/useEditarMaquina';
+import { usePecasAdicionadasComInicial } from './_hooks/usePecasAdicionadasComInicial';
 import { ChevronLeft, ImageIcon, ImageUp, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function AdicionarMaquinaPage() {
-  const router = useRouter();
+type Props = {
+  params: Promise<{
+    id: string;
+  }>;
+};
 
-  // Hooks customizados
-  const { data: pecas = [], isLoading } = usePecasDisponiveis();
-  const { imagem, uploading, handleUpload, removerImagem } = useUploadImagem();
-  const { mutate: criarMaquina, isPending: salvando } = useCriarMaquina();
+export default function EditarMaquinaPage({ params }: Props) {
+  const router = useRouter();
+  const { id } = use(params);
+  const idNumerico = parseInt(id, 10);
+
+  // Hooks de dados
+  const { data: maquina, isLoading: carregandoMaquina } =
+    useMaquina(idNumerico);
+  const { data: pecasDisponiveis = [], isLoading: carregandoPecas } =
+    usePecasDisponiveis();
+  const { mutate: editarMaquina, isPending: salvando } = useEditarMaquina();
+
+  // Estado local
+  const [nome, setNome] = useState('');
+  const [imagemAtual, setImagemAtual] = useState<{
+    url: string;
+    nome: string;
+  } | null>(null);
+  const [uploadingImagem, setUploadingImagem] = useState(false);
+
+  // Hook de peças (inicializado com peças da máquina)
   const {
     pecasAdicionadas,
     pecasPorLocalizacao,
     handleAdicionarPeca,
     handleRemoverPeca,
     limparPecas
-  } = usePecasAdicionadas(pecas);
+  } = usePecasAdicionadasComInicial(
+    pecasDisponiveis,
+    maquina?.pecas.map((p) => ({
+      pecaId: p.pecaId,
+      localizacao: p.localizacao,
+      nome: p.nome,
+      linkLojaIntegrada: p.linkLojaIntegrada
+    })) || []
+  );
 
-  // Estado local
-  const [nome, setNome] = useState('');
+  // Inicializar dados quando máquina carregar
+  useEffect(() => {
+    if (maquina) {
+      setNome(maquina.nome);
+      setImagemAtual({
+        url: maquina.imagem,
+        nome: maquina.nome
+      });
+    }
+  }, [maquina]);
 
-  // Handlers
+  // Upload de nova imagem
+  const handleUploadNovaImagem = useCallback(async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Selecione uma imagem válida');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Imagem muito grande (máx 10MB)');
+      return;
+    }
+
+    const loadingToast = toast.loading('Fazendo upload...');
+    setUploadingImagem(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Erro no upload');
+      }
+
+      setImagemAtual({ url: data.url, nome: file.name });
+      toast.dismiss(loadingToast);
+      toast.success('Imagem atualizada!');
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error(error instanceof Error ? error.message : 'Erro no upload');
+      console.error('Erro no upload:', error);
+    } finally {
+      setUploadingImagem(false);
+    }
+  }, []);
+
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      await handleUpload(file);
+      await handleUploadNovaImagem(file);
     },
-    [handleUpload]
+    [handleUploadNovaImagem]
   );
 
-  const handleRemoverImagemComPecas = useCallback(() => {
-    removerImagem();
+  const handleTrocarImagem = useCallback(() => {
     limparPecas();
-  }, [removerImagem, limparPecas]);
+    setImagemAtual(null);
+  }, [limparPecas]);
 
   const handleSalvar = useCallback(() => {
     if (!nome.trim()) {
@@ -58,7 +135,7 @@ export default function AdicionarMaquinaPage() {
       return;
     }
 
-    if (!imagem) {
+    if (!imagemAtual) {
       toast.error('Selecione uma imagem');
       return;
     }
@@ -68,36 +145,54 @@ export default function AdicionarMaquinaPage() {
       return;
     }
 
-    criarMaquina({
+    editarMaquina({
+      id: idNumerico,
       nome: nome.trim(),
-      imagemUrl: imagem.url,
+      imagemUrl: imagemAtual.url,
       pecas: pecasAdicionadas.map((p) => ({
         pecaId: p.pecaId,
         localizacao: p.localizacao
       }))
     });
-  }, [nome, imagem, pecasAdicionadas, criarMaquina]);
+  }, [nome, imagemAtual, pecasAdicionadas, editarMaquina, idNumerico]);
 
-  // Early returns - Loading
-  if (isLoading) {
+  // Loading states
+  if (carregandoMaquina || carregandoPecas) {
     return (
       <div className='flex-1 h-full w-full flex items-center justify-center'>
         <div className='flex flex-col items-center gap-4'>
           <Spinner className='size-12 text-slate-800' />
-          <div className='text-xl text-muted-foreground'>Carregando...</div>
+          <div className='text-xl text-muted-foreground'>
+            Carregando máquina...
+          </div>
         </div>
       </div>
     );
   }
 
-  // Tela de upload
-  if (!imagem) {
+  // Error state
+  if (!maquina) {
+    return (
+      <div className='flex-1 h-full w-full flex items-center justify-center'>
+        <div className='text-center space-y-4'>
+          <div className='text-6xl'>⚠️</div>
+          <h2 className='text-2xl font-bold'>Máquina não encontrada</h2>
+          <Link href='/maquinas'>
+            <Button className='mt-4'>Voltar para Máquinas</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Tela de upload (caso remova a imagem)
+  if (!imagemAtual) {
     return (
       <div className='flex-1 h-full w-full flex flex-col items-center justify-center gap-6 p-8'>
         <div className='flex flex-col items-center gap-4'>
-          <h1 className='text-3xl font-bold'>Adicionar Nova Máquina</h1>
+          <h1 className='text-3xl font-bold'>Editar Máquina</h1>
           <p className='text-muted-foreground text-center max-w-md'>
-            Faça upload da imagem da máquina para começar
+            Faça upload de uma nova imagem para a máquina
           </p>
         </div>
 
@@ -116,7 +211,7 @@ export default function AdicionarMaquinaPage() {
             type='file'
             accept='image/*'
             onChange={handleFileChange}
-            disabled={uploading}
+            disabled={uploadingImagem}
             className='hidden'
           />
         </div>
@@ -133,7 +228,7 @@ export default function AdicionarMaquinaPage() {
     );
   }
 
-  // Tela principal
+  // Tela principal de edição
   return (
     <div className='flex-1 h-full w-full'>
       <div className='mx-auto h-[calc(100vh-64px)] w-full flex flex-col'>
@@ -141,7 +236,7 @@ export default function AdicionarMaquinaPage() {
           {/* Área da imagem */}
           <div className='relative w-1/2 flex items-center justify-center p-4'>
             <Button
-              onClick={handleRemoverImagemComPecas}
+              onClick={handleTrocarImagem}
               className='absolute h-10 w-40 top-4 right-4 bg-slate-800 rounded-none z-10'>
               <ImageUp className='size-5 text-white' />
               <span className='text-white'>Trocar Imagem</span>
@@ -149,8 +244,8 @@ export default function AdicionarMaquinaPage() {
 
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={imagem.url}
-              alt='Preview da máquina'
+              src={imagemAtual.url}
+              alt={nome || 'Preview da máquina'}
               className='w-full h-full object-contain'
             />
 
@@ -162,7 +257,7 @@ export default function AdicionarMaquinaPage() {
                   <AdicionarPeca
                     key={index}
                     localizacao={index}
-                    pecasDisponiveis={pecas}
+                    pecasDisponiveis={pecasDisponiveis}
                     pecaExistente={
                       pecaExistente
                         ? {
@@ -185,7 +280,7 @@ export default function AdicionarMaquinaPage() {
               <div className='flex items-center gap-2 text-sm'>
                 <ImageIcon className='w-4 h-4 text-blue-400' />
                 <span className='text-white font-medium truncate'>
-                  {imagem.nome}
+                  {imagemAtual.nome}
                 </span>
               </div>
             </div>
@@ -231,7 +326,7 @@ export default function AdicionarMaquinaPage() {
           <Button
             onClick={handleSalvar}
             disabled={salvando || !nome.trim() || pecasAdicionadas.length === 0}
-            className='h-14 min-w-48 bg-green-600 border-none rounded-none hover:bg-green-700 text-white disabled:opacity-50'>
+            className='h-14 min-w-48 bg-blue-600 border-none rounded-none hover:bg-blue-700 text-white disabled:opacity-50'>
             {salvando ? (
               <>
                 <Spinner className='size-5 mr-2' />
@@ -240,7 +335,7 @@ export default function AdicionarMaquinaPage() {
             ) : (
               <>
                 <Save className='size-5 mr-1' />
-                Salvar Máquina
+                Salvar Alterações
               </>
             )}
           </Button>
