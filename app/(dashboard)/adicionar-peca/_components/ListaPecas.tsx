@@ -13,62 +13,45 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger
+  DialogTitle
 } from '@/components/ui/dialog';
 
-import { deletarPeca } from '../_actions/pecas';
+import { useDeletarPeca } from '../_hooks/useDeletarPeca';
+import type { Peca } from '../_types';
 import FormularioPeca from './FormularioPeca';
 import { Edit, Store, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-
-type PecaType = {
-  id: number;
-  nome: string;
-  linkLojaIntegrada: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 type ListaPecasProps = {
-  pecas: PecaType[];
+  pecas: Peca[];
 };
 
 export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
-  const [pecaParaEditar, setPecaParaEditar] = useState<PecaType | null>(null);
+  const [pecaParaEditar, setPecaParaEditar] = useState<Peca | null>(null);
   const [dialogAberto, setDialogAberto] = useState(false);
   const [pecaParaDeletar, setPecaParaDeletar] = useState<{
     id: number;
     nome: string;
   } | null>(null);
 
-  async function handleConfirmarDeletar() {
+  const { mutate: deletarPeca, isPending: deletando } = useDeletarPeca();
+
+  function handleConfirmarDeletar() {
     if (!pecaParaDeletar) return;
 
-    const result = await deletarPeca(pecaParaDeletar.id);
-
-    if (result.success) {
-      toast.success(result.message);
-    } else {
-      toast.error(result.message);
-    }
-
-    setPecaParaDeletar(null);
+    deletarPeca(pecaParaDeletar.id, {
+      onSettled: () => {
+        setPecaParaDeletar(null);
+      }
+    });
   }
 
-  function handleEditar(peca: PecaType) {
+  function handleEditar(peca: Peca) {
     setPecaParaEditar(peca);
     setDialogAberto(true);
   }
@@ -157,13 +140,14 @@ export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className='rounded-sm'>
+            <AlertDialogCancel className='rounded-sm' disabled={deletando}>
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmarDeletar}
+              disabled={deletando}
               className='bg-red-600 hover:bg-red-700 rounded-sm'>
-              Deletar
+              {deletando ? 'Deletando...' : 'Deletar'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

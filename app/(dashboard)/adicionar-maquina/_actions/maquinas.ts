@@ -14,9 +14,18 @@ type ActionResult<T = void> = {
 };
 
 // Lista peças disponíveis para adicionar
-export async function listarPecasDisponiveis() {
+export async function listarPecasDisponiveis(): Promise<
+  ActionResult<{ id: number; nome: string; linkLojaIntegrada: string }[]>
+> {
   try {
-    const resultado = await db.select().from(pecas).orderBy(pecas.nome);
+    const resultado = await db
+      .select({
+        id: pecas.id,
+        nome: pecas.nome,
+        linkLojaIntegrada: pecas.linkLojaIntegrada
+      })
+      .from(pecas)
+      .orderBy(pecas.nome);
 
     return {
       success: true,
@@ -62,32 +71,34 @@ export async function criarMaquinaCompleta(
       };
     }
 
-    // Criar máquina
-    const [novaMaquina] = await db
-      .insert(maquinas)
-      .values({
-        nome: nome.trim(),
-        imagem: imagemUrl
-      })
-      .returning({ id: maquinas.id });
+    // Criar máquina e adicionar peças em transação
+    const resultado = await db.transaction(async (tx) => {
+      const [novaMaquina] = await tx
+        .insert(maquinas)
+        .values({
+          nome: nome.trim(),
+          imagem: imagemUrl
+        })
+        .returning({ id: maquinas.id });
 
-    // Adicionar peças em batch
-    if (pecasParaAdicionar.length > 0) {
-      await db.insert(pecasNaMaquina).values(
+      // Adicionar peças em batch
+      await tx.insert(pecasNaMaquina).values(
         pecasParaAdicionar.map((p) => ({
           maquinaId: novaMaquina.id,
           pecaId: p.pecaId,
           localizacao: p.localizacao
         }))
       );
-    }
+
+      return novaMaquina;
+    });
 
     revalidatePath('/maquinas');
 
     return {
       success: true,
       message: 'Máquina criada com sucesso!',
-      data: { id: novaMaquina.id }
+      data: { id: resultado.id }
     };
   } catch (error) {
     console.error('Erro ao criar máquina:', error);

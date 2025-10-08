@@ -15,17 +15,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
+import type { PecaAdicionada } from '../_types';
 import { Trash2 } from 'lucide-react';
 
-type PecaLocalType = {
-  localizacao: number;
-  pecaId: number;
-  nome: string;
-  linkLoja: string;
-};
-
 type ListaPecasMaquinaProps = {
-  pecas: PecaLocalType[];
+  pecas: PecaAdicionada[];
   onRemover: (localizacao: number) => void;
 };
 

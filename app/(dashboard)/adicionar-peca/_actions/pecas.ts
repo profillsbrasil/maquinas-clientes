@@ -5,27 +5,32 @@ import { revalidatePath } from 'next/cache';
 import db from '@/db/connection';
 import { pecas } from '@/db/schema/pecas';
 
+import type { ActionResult } from '../_types';
 import { eq } from 'drizzle-orm';
-
-// Tipos para os retornos das actions
-type ActionResult<T = void> = {
-  success: boolean;
-  message: string;
-  data?: T;
-  errors?: Record<string, string[]>;
-};
-
-// Função para gerar ID de 8 dígitos
-function gerarId(): number {
-  return Math.floor(10000000 + Math.random() * 90000000);
-}
 
 // Action para listar todas as peças
 export async function listarPecas(): Promise<
-  ActionResult<(typeof pecas.$inferSelect)[]>
+  ActionResult<
+    {
+      id: number;
+      nome: string;
+      linkLojaIntegrada: string;
+      createdAt: Date;
+      updatedAt: Date;
+    }[]
+  >
 > {
   try {
-    const todasPecas = await db.select().from(pecas).orderBy(pecas.createdAt);
+    const todasPecas = await db
+      .select({
+        id: pecas.id,
+        nome: pecas.nome,
+        linkLojaIntegrada: pecas.linkLojaIntegrada,
+        createdAt: pecas.createdAt,
+        updatedAt: pecas.updatedAt
+      })
+      .from(pecas)
+      .orderBy(pecas.createdAt);
 
     return {
       success: true,
@@ -67,14 +72,14 @@ export async function criarPeca(formData: FormData): Promise<ActionResult> {
       };
     }
 
-    // Criar a peça
+    // Criar a peça (id é gerado automaticamente pelo banco)
     await db.insert(pecas).values({
-      id: gerarId(),
       nome: nome.trim(),
       linkLojaIntegrada: linkLojaIntegrada.trim()
     });
 
     revalidatePath('/adicionar-peca');
+    revalidatePath('/adicionar-maquina');
 
     return {
       success: true,
@@ -122,11 +127,13 @@ export async function editarPeca(
       .update(pecas)
       .set({
         nome: nome.trim(),
-        linkLojaIntegrada: linkLojaIntegrada.trim()
+        linkLojaIntegrada: linkLojaIntegrada.trim(),
+        updatedAt: new Date()
       })
       .where(eq(pecas.id, id));
 
     revalidatePath('/adicionar-peca');
+    revalidatePath('/adicionar-maquina');
 
     return {
       success: true,
@@ -147,6 +154,7 @@ export async function deletarPeca(id: number): Promise<ActionResult> {
     await db.delete(pecas).where(eq(pecas.id, id));
 
     revalidatePath('/adicionar-peca');
+    revalidatePath('/adicionar-maquina');
 
     return {
       success: true,
@@ -162,11 +170,26 @@ export async function deletarPeca(id: number): Promise<ActionResult> {
 }
 
 // Action para buscar uma peça específica
-export async function buscarPeca(
-  id: number
-): Promise<ActionResult<typeof pecas.$inferSelect>> {
+export async function buscarPeca(id: number): Promise<
+  ActionResult<{
+    id: number;
+    nome: string;
+    linkLojaIntegrada: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }>
+> {
   try {
-    const [peca] = await db.select().from(pecas).where(eq(pecas.id, id));
+    const [peca] = await db
+      .select({
+        id: pecas.id,
+        nome: pecas.nome,
+        linkLojaIntegrada: pecas.linkLojaIntegrada,
+        createdAt: pecas.createdAt,
+        updatedAt: pecas.updatedAt
+      })
+      .from(pecas)
+      .where(eq(pecas.id, id));
 
     if (!peca) {
       return {

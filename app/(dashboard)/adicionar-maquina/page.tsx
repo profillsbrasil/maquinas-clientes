@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,140 +10,49 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 
-import { useInvalidarMaquinas } from '../maquinas/_hooks/useMaquinas';
-import {
-  criarMaquinaCompleta,
-  listarPecasDisponiveis
-} from './_actions/maquinas';
 import AdicionarPeca from './_components/AdicionarPeca';
 import ListaPecasMaquina from './_components/ListaPecasMaquina';
+import { useCriarMaquina } from './_hooks/useCriarMaquina';
+import { usePecasAdicionadas } from './_hooks/usePecasAdicionadas';
+import { usePecasDisponiveis } from './_hooks/usePecasDisponiveis';
+import { useUploadImagem } from './_hooks/useUploadImagem';
 import { ChevronLeft, ImageIcon, ImageUp, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
-type Peca = {
-  id: number;
-  nome: string;
-  linkLojaIntegrada: string;
-};
-
-type PecaAdicionada = {
-  localizacao: number;
-  pecaId: number;
-  nome: string;
-  linkLoja: string;
-};
-
 export default function AdicionarMaquinaPage() {
   const router = useRouter();
-  const invalidarMaquinas = useInvalidarMaquinas();
 
-  // Estados essenciais
-  const [imagem, setImagem] = useState<{ url: string; nome: string } | null>(
-    null
-  );
+  // Hooks customizados
+  const { data: pecas = [], isLoading } = usePecasDisponiveis();
+  const { imagem, uploading, handleUpload, removerImagem } = useUploadImagem();
+  const { mutate: criarMaquina, isPending: salvando } = useCriarMaquina();
+  const {
+    pecasAdicionadas,
+    pecasPorLocalizacao,
+    handleAdicionarPeca,
+    handleRemoverPeca,
+    limparPecas
+  } = usePecasAdicionadas(pecas);
+
+  // Estado local
   const [nome, setNome] = useState('');
-  const [pecas, setPecas] = useState<Peca[]>([]);
-  const [pecasAdicionadas, setPecasAdicionadas] = useState<PecaAdicionada[]>(
-    []
-  );
-  const [loading, setLoading] = useState(true);
-  const [salvando, setSalvando] = useState(false);
 
-  // Carregar peças disponíveis
-  useEffect(() => {
-    async function carregar() {
-      const result = await listarPecasDisponiveis();
-      setPecas(result.data || []);
-      setLoading(false);
-    }
-    carregar();
-  }, []);
-
-  // Upload de imagem via API
-  const handleUpload = useCallback(
+  // Handlers
+  const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-
-      if (!file.type.startsWith('image/')) {
-        toast.error('Selecione uma imagem válida');
-        return;
-      }
-
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('Imagem muito grande (máx 10MB)');
-        return;
-      }
-
-      const loadingToast = toast.loading('Fazendo upload...');
-
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || !data.success) {
-          throw new Error(data.error || 'Erro no upload');
-        }
-
-        setImagem({ url: data.url, nome: file.name });
-        toast.dismiss(loadingToast);
-        toast.success('Imagem carregada!');
-      } catch (error) {
-        toast.dismiss(loadingToast);
-        toast.error(error instanceof Error ? error.message : 'Erro no upload');
-        console.error('Erro:', error);
-      }
+      await handleUpload(file);
     },
-    []
+    [handleUpload]
   );
 
-  const handleRemoverImagem = useCallback(() => {
-    setImagem(null);
-    setPecasAdicionadas([]);
-  }, []);
+  const handleRemoverImagemComPecas = useCallback(() => {
+    removerImagem();
+    limparPecas();
+  }, [removerImagem, limparPecas]);
 
-  const handleAdicionarPeca = useCallback(
-    (localizacao: number, pecaId: number) => {
-      const peca = pecas.find((p) => p.id === pecaId);
-      if (!peca) return;
-
-      if (pecasAdicionadas.some((p) => p.localizacao === localizacao)) {
-        toast.error('Já existe peça nesta localização');
-        return;
-      }
-
-      setPecasAdicionadas([
-        ...pecasAdicionadas,
-        {
-          localizacao,
-          pecaId: peca.id,
-          nome: peca.nome,
-          linkLoja: peca.linkLojaIntegrada
-        }
-      ]);
-      toast.success('Peça adicionada!');
-    },
-    [pecas, pecasAdicionadas]
-  );
-
-  const handleRemoverPeca = useCallback(
-    (localizacao: number) => {
-      setPecasAdicionadas(
-        pecasAdicionadas.filter((p) => p.localizacao !== localizacao)
-      );
-      toast.success('Peça removida!');
-    },
-    [pecasAdicionadas]
-  );
-
-  const handleSalvar = useCallback(async () => {
+  const handleSalvar = useCallback(() => {
     if (!nome.trim()) {
       toast.error('Digite o nome da máquina');
       return;
@@ -159,43 +68,18 @@ export default function AdicionarMaquinaPage() {
       return;
     }
 
-    setSalvando(true);
+    criarMaquina({
+      nome: nome.trim(),
+      imagemUrl: imagem.url,
+      pecas: pecasAdicionadas.map((p) => ({
+        pecaId: p.pecaId,
+        localizacao: p.localizacao
+      }))
+    });
+  }, [nome, imagem, pecasAdicionadas, criarMaquina]);
 
-    try {
-      const result = await criarMaquinaCompleta(
-        nome,
-        imagem.url,
-        pecasAdicionadas.map((p) => ({
-          pecaId: p.pecaId,
-          localizacao: p.localizacao
-        }))
-      );
-
-      if (!result.success) {
-        toast.error(result.message);
-        setSalvando(false);
-        return;
-      }
-
-      // Invalidar cache para refletir a nova máquina
-      invalidarMaquinas();
-
-      toast.success('Máquina criada com sucesso!');
-      setTimeout(() => router.push('/maquinas'), 800);
-    } catch (error) {
-      console.error('Erro:', error);
-      toast.error('Erro ao salvar máquina');
-      setSalvando(false);
-    }
-  }, [nome, imagem, pecasAdicionadas, router, invalidarMaquinas]);
-
-  // Mapa de peças por localização
-  const pecasPorLocalizacao = useMemo(
-    () => new Map(pecasAdicionadas.map((p) => [p.localizacao, p])),
-    [pecasAdicionadas]
-  );
-
-  if (loading) {
+  // Early returns - Loading
+  if (isLoading) {
     return (
       <div className='flex-1 h-full w-full flex items-center justify-center'>
         <div className='flex flex-col items-center gap-4'>
@@ -231,7 +115,8 @@ export default function AdicionarMaquinaPage() {
             id='upload-imagem'
             type='file'
             accept='image/*'
-            onChange={handleUpload}
+            onChange={handleFileChange}
+            disabled={uploading}
             className='hidden'
           />
         </div>
@@ -256,7 +141,7 @@ export default function AdicionarMaquinaPage() {
           {/* Área da imagem */}
           <div className='relative w-1/2 flex items-center justify-center p-4'>
             <Button
-              onClick={handleRemoverImagem}
+              onClick={handleRemoverImagemComPecas}
               className='absolute h-10 w-40 top-4 right-4 bg-slate-800 rounded-none z-10'>
               <ImageUp className='size-5 text-white' />
               <span className='text-white'>Trocar Imagem</span>
@@ -281,7 +166,6 @@ export default function AdicionarMaquinaPage() {
                     pecaExistente={
                       pecaExistente
                         ? {
-                            pecaId: pecaExistente.pecaId,
                             nome: pecaExistente.nome,
                             linkLoja: pecaExistente.linkLoja
                           }

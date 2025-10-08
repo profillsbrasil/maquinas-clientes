@@ -23,25 +23,14 @@ import {
   SelectValue
 } from '@/components/ui/select';
 
+import type { Peca, PecaAdicionada } from '../_types';
 import { Plus, Store, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-type PecaType = {
-  id: number;
-  nome: string;
-  linkLojaIntegrada: string;
-};
-
-type PecaNaMaquinaLocal = {
-  pecaId: number;
-  nome: string;
-  linkLoja: string;
-};
-
 type AdicionarPecaProps = {
   localizacao: number;
-  pecasDisponiveis: PecaType[];
-  pecaExistente?: PecaNaMaquinaLocal | null;
+  pecasDisponiveis: Peca[];
+  pecaExistente?: Omit<PecaAdicionada, 'localizacao' | 'pecaId'> | null;
   onAdicionar: (localizacao: number, pecaId: number) => void;
 };
 

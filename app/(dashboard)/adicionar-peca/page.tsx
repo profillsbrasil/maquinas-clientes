@@ -1,10 +1,13 @@
-import { listarPecas } from './_actions/pecas';
+'use client';
+
+import { Spinner } from '@/components/ui/spinner';
+
 import DialogCriarPeca from './_components/DialogCriarPeca';
 import ListaPecas from './_components/ListaPecas';
+import { usePecas } from './_hooks/usePecas';
 
-export default async function AdicionarPecaPage() {
-  const result = await listarPecas();
-  const pecas = result.data || [];
+export default function AdicionarPecaPage() {
+  const { data: pecas = [], isLoading, error } = usePecas();
 
   return (
     <main className='flex-1 p-6'>
@@ -26,7 +29,18 @@ export default async function AdicionarPecaPage() {
         {/* Lista de Peças */}
         <div>
           <h2 className='text-xl font-semibold mb-4'>Todas as Peças</h2>
-          <ListaPecas pecas={pecas} />
+
+          {isLoading ? (
+            <div className='flex items-center justify-center py-12'>
+              <Spinner className='size-8 text-slate-800' />
+            </div>
+          ) : error ? (
+            <div className='text-center py-12 text-red-500'>
+              Erro ao carregar peças. Tente novamente.
+            </div>
+          ) : (
+            <ListaPecas pecas={pecas} />
+          )}
         </div>
       </div>
     </main>

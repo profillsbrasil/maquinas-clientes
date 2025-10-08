@@ -32,25 +32,6 @@ Você é um desenvolvedor Senior Front-End especialista em ReactJS, Next.js 15, 
 - **ORM**: Drizzle
 - **Autenticação**: Better Auth
 
-### Estrutura de Pastas
-
-```
-app/
-  (dashboard)/          # Rotas autenticadas
-    _components/        # Componentes compartilhados
-    [rota]/
-      _actions/         # Server actions
-      _components/      # Componentes da rota
-      _hooks/           # Componentes hooks
-      page.tsx          # Página da rota
-  api/                  # API routes (só para uploads/webhooks)
-lib/
-  providers/            # React providers
-  hooks/                # Global Hooks
-  utils/                # Utilitários
-components/             # Componentes UI globais
-```
-
 ## Padrões de Código
 
 ### 1. Server Actions (Preferência)
@@ -143,8 +124,8 @@ export function useDeletarItem() {
 ### 4. TypeScript Rigoroso
 
 - Sempre defina tipos explícitos
-- Use `type` ao invés de `interface` para objetos simples
-- Evite `any` - use `unknown` se necessário
+- Use `type` e `interface` no arquivo conforme nescessario
+- Evite `any` - use `unknown` se necessário, mes sempre tente tipar
 - Types devem estar próximos ao código que os usa
 
 ```typescript
@@ -194,54 +175,7 @@ export default function CardMaquina({ id, nome }: Props) {
 }
 ```
 
-### 6. Estrutura de Componentes
-
-**Ordem de declaração:**
-
-```typescript
-'use client';
-
-// 1. Imports externos
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-// 2. Imports do projeto
-import { Button } from '@/components/ui/button';
-import { useCustomHook } from '@/lib/hooks/useCustomHook';
-
-// 3. Types
-type Props = {
-  id: number;
-  nome: string;
-};
-
-// 4. Componente
-export default function Componente({ id, nome }: Props) {
-  // 5. Hooks (ordem: router, query, state, refs, callbacks)
-  const router = useRouter();
-  const { data } = useCustomHook();
-  const [state, setState] = useState(false);
-
-  // 6. Handlers
-  function handleClick() {
-    // ...
-  }
-
-  // 7. Effects
-  useEffect(() => {
-    // ...
-  }, []);
-
-  // 8. Early returns
-  if (isLoading) return <Skeleton />;
-  if (error) return <Error />;
-
-  // 9. Render
-  return <div>...</div>;
-}
-```
-
-### 7. Performance
+### 6. Performance
 
 **Prefetching:**
 
@@ -284,7 +218,7 @@ const items = await db
   .from(table);
 ```
 
-### 8. Error Handling
+### 7. Error Handling
 
 ```typescript
 // Server Actions - sempre try/catch
@@ -310,6 +244,8 @@ if (error) {
   );
 }
 ```
+
+Sempre utilze `toast` para informar de erros ou sucessos
 
 ### 9. Acessibilidade
 
@@ -361,7 +297,6 @@ className={`
 - Crie API Routes para CRUD simples (use server actions)
 - Ignore erros (sempre trate)
 - Use CSS inline (use Tailwind)
-- Esqueça acessibilidade
 - Deixe código comentado
 - Use cache no servidor (Next.js cache problemático)
 - Faça queries sem cache do TanStack Query
