@@ -80,8 +80,8 @@ export default function EditarMaquinaPage({ params }: Props) {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Imagem muito grande (máx 5MB)');
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Imagem muito grande (máx 10MB)');
       return;
     }
 
@@ -203,7 +203,7 @@ export default function EditarMaquinaPage({ params }: Props) {
             <ImageIcon className='w-12 h-12 text-slate-400 group-hover:text-blue-500' />
             <span className='font-medium'>Clique para fazer upload</span>
             <span className='text-xs text-muted-foreground'>
-              PNG, JPG, WEBP (máx. 5MB)
+              PNG, JPG, WEBP (máx. 10MB)
             </span>
           </Label>
           <Input
@@ -247,6 +247,8 @@ export default function EditarMaquinaPage({ params }: Props) {
               src={imagemAtual.url}
               alt={nome || 'Preview da máquina'}
               className='w-full h-full object-contain'
+              loading='eager'
+              decoding='async'
             />
 
             {/* Grid de localizações */}

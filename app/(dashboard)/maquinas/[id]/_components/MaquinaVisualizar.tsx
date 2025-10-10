@@ -49,6 +49,8 @@ export default function MaquinaVisualizar({ maquina }: Props) {
             src={maquina.imagem}
             alt={maquina.nome}
             className='w-full h-full object-contain'
+            loading='eager'
+            decoding='async'
           />
 
           {/* Grid de peças */}

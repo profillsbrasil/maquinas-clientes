@@ -72,6 +72,7 @@ export default function CardMaquina({ id, nome, imagem, totalPecas }: Props) {
               alt={nome}
               className='w-full h-full object-contain'
               loading='lazy'
+              decoding='async'
             />
           </div>
           {totalPecas > 0 && (

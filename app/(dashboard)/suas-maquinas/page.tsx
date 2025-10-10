@@ -25,11 +25,13 @@ export default function SuasMaquinasPage() {
                 key={maquina.id}
                 className='flex relative flex-col hover:scale-101 transition-all duration-300 items-center border border-slate-900 shadow-md rounded-sm  justify-center max-h-100 bg-muted'>
                 <GridPatternBg />
-                <div className='flex h-75 px-4 py-2 w-full z-10'>
+                <div className='flex h-75 px-4 py-2 w-full z-10 relative'>
                   <Image
                     src={maquina.image}
                     alt={maquina.name}
-                    className='w-full h-full object-contain'
+                    fill
+                    sizes='(max-width: 768px) 100vw, 25vw'
+                    className='object-contain'
                   />
                 </div>
                 <div className='flex-1 h-25 px-4 pb-4 w-full text-center space-y-2 z-10'>
