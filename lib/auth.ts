@@ -15,6 +15,19 @@ export const auth = betterAuth({
     minPasswordLength: 8,
     maxPasswordLength: 128
   },
+
+  // Campos adicionais do usuário
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        required: true,
+        defaultValue: 'cliente',
+        input: false // Não permite que o usuário defina o role ao se registrar
+      }
+    }
+  },
+
   // URL base da aplicação (OBRIGATÓRIO para Vercel)
   baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
 

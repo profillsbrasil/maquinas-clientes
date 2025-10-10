@@ -10,15 +10,8 @@ import QueryProvider from '@/lib/providers/QueryProvider';
 
 import Header from './_components/sidebar/Header';
 import Sidebar from './_components/sidebar/Sidebar';
-
-const routeTitles: Record<string, string> = {
-  '/': 'Dashboard',
-  '/suas-maquinas': 'Suas Máquinas',
-  '/configuracoes': 'Configurações',
-  '/adicionar-maquina': 'Adicionar Máquina',
-  '/maquinas': 'Máquinas',
-  '/adicionar-peca': 'Adicionar Peça'
-};
+import { getPageTitle } from './_components/sidebar/nav-config';
+import { useRouteProtection } from './_hooks/useRouteProtection';
 
 export default function DashboardLayout({
   children
@@ -30,11 +23,14 @@ export default function DashboardLayout({
   const { data: session, isPending } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const pageTitle = routeTitles[pathname] || 'Dashboard';
+  const pageTitle = getPageTitle(pathname);
 
   useEffect(() => {
     redirectIfNotAuthenticated(session, isPending, router);
   }, [session, isPending, router]);
+
+  // Proteção de rotas baseada em permissões
+  useRouteProtection(session);
 
   if (isPending) {
     return (
@@ -56,7 +52,7 @@ export default function DashboardLayout({
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
-        <div className='flex-1 flex flex-col  '>
+        <div className='flex-1 flex flex-col'>
           <Header
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}

@@ -76,7 +76,7 @@ export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
         {pecasIniciais.map((peca) => (
           <Card key={peca.id} className='rounded-sm'>
-            <CardContent className='flex w-full justify-between '>
+            <CardContent className='flex w-full justify-between  rounded-sm'>
               <div className='flex flex-col gap-2'>
                 <h3 className='text-lg font-bold'>{peca.nome}</h3>
                 <a
@@ -93,7 +93,7 @@ export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
                 <Button
                   variant='outline'
                   size='sm'
-                  className='bg-slate-800 hover:bg-slate-700 border-none'
+                  className='bg-slate-800 hover:bg-slate-700 border-none rounded-sm'
                   onClick={() => handleEditar(peca)}>
                   <Edit className='h-4 w-4 text-white ' />
                 </Button>
@@ -101,7 +101,7 @@ export default function ListaPecas({ pecas: pecasIniciais }: ListaPecasProps) {
                 <Button
                   variant='destructive'
                   size='sm'
-                  className='border-none'
+                  className='border-none rounded-sm'
                   onClick={() =>
                     setPecaParaDeletar({ id: peca.id, nome: peca.nome })
                   }>

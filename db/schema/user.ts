@@ -18,6 +18,10 @@ const timestamp = customType<{ data: Date; driverData: string }>({
   }
 });
 
+export type Role = 'cliente' | 'engenheiro' | 'admin';
+
+export const roles: Role[] = ['cliente', 'engenheiro', 'admin'];
+
 export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -26,6 +30,7 @@ export const user = sqliteTable('user', {
     .notNull()
     .default(false),
   image: text('image'),
+  role: text('role').notNull().default('cliente').$type<Role>(),
   createdAt: timestamp('created_at')
     .notNull()
     .default(sql`(datetime('now'))`),
