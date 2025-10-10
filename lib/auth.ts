@@ -16,7 +16,7 @@ export const auth = betterAuth({
     maxPasswordLength: 128
   },
   // URL base da aplicação (OBRIGATÓRIO para Vercel)
-  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:3000',
+  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
 
   // Secret para assinar tokens (OBRIGATÓRIO para produção)
   secret: process.env.BETTER_AUTH_SECRET,
@@ -34,7 +34,7 @@ export const auth = betterAuth({
   // Origens confiáveis
   trustedOrigins: [
     'http://localhost:3000',
-    process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
+    process.env.BETTER_AUTH_URL,
     process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined
   ].filter(Boolean) as string[],
 

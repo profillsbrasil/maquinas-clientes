@@ -12,7 +12,7 @@ bun install
 TURSO_DATABASE_URL=libsql://sua-database.turso.io
 TURSO_AUTH_TOKEN=seu-token-turso
 BETTER_AUTH_SECRET=use-openssl-rand-base64-32-para-gerar
-NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=http://localhost:3000
 
 # Aplicar schema
 bun run db:push
@@ -89,7 +89,7 @@ bun run db:studio    # UI do banco
 
 **Variáveis obrigatórias na Vercel:**
 
-- `NEXT_PUBLIC_BETTER_AUTH_URL` - URL do seu app (https://seu-dominio.vercel.app)
+- `BETTER_AUTH_URL` - URL do seu app (https://seu-dominio.vercel.app)
 - `BETTER_AUTH_SECRET` - Gere com `openssl rand -base64 32`
 - `TURSO_DATABASE_URL` - URL do banco Turso
 - `TURSO_AUTH_TOKEN` - Token de autenticação do Turso
