@@ -13,24 +13,68 @@ import { toast } from 'sonner';
 export const maquinasKeys = {
   all: ['maquinas'] as const,
   lists: () => [...maquinasKeys.all, 'list'] as const,
-  list: () => [...maquinasKeys.lists()] as const,
+  list: (page: number = 1, limit: number = 8) =>
+    [...maquinasKeys.lists(), { page, limit }] as const,
   details: () => [...maquinasKeys.all, 'detail'] as const,
   detail: (id: number) => [...maquinasKeys.details(), id] as const
 };
 
-// Hook para listar máquinas (com cache automático)
-export function useMaquinas() {
-  return useQuery({
-    queryKey: maquinasKeys.list(),
+// Hook para listar máquinas com paginação
+export function useMaquinas(page: number = 1, limit: number = 8) {
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
+    queryKey: maquinasKeys.list(page, limit),
     queryFn: async () => {
-      const result = await listarMaquinas();
-      if (!result.success) {
+      const result = await listarMaquinas(page, limit);
+      if (!result.success || !result.data) {
         throw new Error(result.message);
       }
-      return result.data || [];
+      return result.data;
     },
-    staleTime: 1000 * 60 * 5 // 5 minutos
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    placeholderData: (previousData) => previousData // Mantém dados anteriores durante carregamento
   });
+
+  // Prefetch da próxima página (se existir)
+  const prefetchNextPage = () => {
+    if (query.data && page < query.data.totalPages) {
+      queryClient.prefetchQuery({
+        queryKey: maquinasKeys.list(page + 1, limit),
+        queryFn: async () => {
+          const result = await listarMaquinas(page + 1, limit);
+          if (!result.success || !result.data) {
+            throw new Error(result.message);
+          }
+          return result.data;
+        },
+        staleTime: 1000 * 60 * 5
+      });
+    }
+  };
+
+  // Prefetch da página anterior (se existir)
+  const prefetchPreviousPage = () => {
+    if (page > 1) {
+      queryClient.prefetchQuery({
+        queryKey: maquinasKeys.list(page - 1, limit),
+        queryFn: async () => {
+          const result = await listarMaquinas(page - 1, limit);
+          if (!result.success || !result.data) {
+            throw new Error(result.message);
+          }
+          return result.data;
+        },
+        staleTime: 1000 * 60 * 5
+      });
+    }
+  };
+
+  return {
+    ...query,
+    prefetchNextPage,
+    prefetchPreviousPage
+  };
 }
 
 // Hook para buscar uma máquina específica (com cache)
@@ -60,34 +104,16 @@ export function useDeletarMaquina() {
       }
       return { id, message: result.message };
     },
-    // Renderização otimista
-    onMutate: async (id) => {
-      // Cancelar queries em andamento
-      await queryClient.cancelQueries({ queryKey: maquinasKeys.list() });
-
-      // Snapshot do estado anterior
-      const previousMaquinas = queryClient.getQueryData(maquinasKeys.list());
-
-      // Atualizar cache otimisticamente (remove a máquina)
-      queryClient.setQueryData(maquinasKeys.list(), (old: unknown) => {
-        if (!old) return [];
-        return (old as { id: number }[]).filter((m) => m.id !== id);
-      });
-
-      return { previousMaquinas };
-    },
-    // Se der erro, reverter
-    onError: (error, id, context) => {
-      if (context?.previousMaquinas) {
-        queryClient.setQueryData(maquinasKeys.list(), context.previousMaquinas);
-      }
-      toast.error(error instanceof Error ? error.message : 'Erro ao deletar');
-    },
-    // Ao sucesso, invalidar queries relacionadas
+    // Ao sucesso, invalidar todas as páginas de máquinas
     onSuccess: (data) => {
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: maquinasKeys.list() });
+      // Invalidar todas as queries de listagem (todas as páginas)
+      queryClient.invalidateQueries({ queryKey: maquinasKeys.lists() });
+      // Remover query específica da máquina
       queryClient.removeQueries({ queryKey: maquinasKeys.detail(data.id) });
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Erro ao deletar');
     }
   });
 }

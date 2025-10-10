@@ -16,32 +16,78 @@ type ActionResult<T = void> = {
   data?: T;
 };
 
-// Lista todas as máquinas com count de peças
-// Query otimizada: busca APENAS os campos necessários
-export async function listarMaquinas() {
+type ListarMaquinasResult = {
+  maquinas: {
+    id: number;
+    nome: string;
+    imagem: string;
+    totalPecas: number;
+  }[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+// Lista todas as máquinas com paginação
+// Query otimizada: busca APENAS os campos necessários com offset/limit
+export async function listarMaquinas(
+  page: number = 1,
+  limit: number = 8
+): Promise<ActionResult<ListarMaquinasResult>> {
   try {
+    // Validação de parâmetros
+    const validPage = Math.max(1, page);
+    const validLimit = Math.max(1, Math.min(100, limit)); // Máx 100 por página
+    const offset = (validPage - 1) * validLimit;
+
+    // Query para contar total de máquinas (sem join para performance)
+    const [{ total }] = await db
+      .select({
+        total: sql<number>`cast(count(*) as int)`
+      })
+      .from(maquinas);
+
+    // Query paginada para buscar máquinas com count de peças
     const resultado = await db
       .select({
         id: maquinas.id,
         nome: maquinas.nome,
-        imagem: maquinas.imagem, // URL da imagem (não base64)
+        imagem: maquinas.imagem,
         totalPecas: sql<number>`cast(count(${pecasNaMaquina.id}) as int)`
       })
       .from(maquinas)
       .leftJoin(pecasNaMaquina, eq(maquinas.id, pecasNaMaquina.maquinaId))
       .groupBy(maquinas.id)
-      .orderBy(maquinas.nome); // Ordenar por nome é mais útil
+      .orderBy(maquinas.nome)
+      .limit(validLimit)
+      .offset(offset);
+
+    const totalPages = Math.ceil(total / validLimit);
 
     return {
       success: true,
-      data: resultado
+      message: 'Máquinas carregadas com sucesso',
+      data: {
+        maquinas: resultado,
+        total,
+        page: validPage,
+        limit: validLimit,
+        totalPages
+      }
     };
   } catch (error) {
     console.error('Erro ao listar máquinas:', error);
     return {
       success: false,
       message: 'Erro ao carregar máquinas',
-      data: []
+      data: {
+        maquinas: [],
+        total: 0,
+        page: 1,
+        limit: 8,
+        totalPages: 0
+      }
     };
   }
 }
