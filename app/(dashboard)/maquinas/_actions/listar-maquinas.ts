@@ -6,6 +6,7 @@ import db from '@/db/connection';
 import { maquinas } from '@/db/schema/maquinas';
 import { pecas } from '@/db/schema/pecas';
 import { pecasNaMaquina } from '@/db/schema/pecas_na_maquina';
+import { del } from '@vercel/blob';
 
 import { eq, sql } from 'drizzle-orm';
 
@@ -86,9 +87,35 @@ export async function buscarMaquina(id: number) {
   }
 }
 
-// Deleta uma máquina
+// Deleta uma máquina e sua imagem do Blob Storage
 export async function deletarMaquina(id: number): Promise<ActionResult> {
   try {
+    // Buscar a máquina para obter a URL da imagem
+    const [maquina] = await db
+      .select({ imagem: maquinas.imagem })
+      .from(maquinas)
+      .where(eq(maquinas.id, id))
+      .limit(1);
+
+    if (!maquina) {
+      return {
+        success: false,
+        message: 'Máquina não encontrada'
+      };
+    }
+
+    // Deletar a imagem do Blob Storage (se for URL do Blob)
+    if (maquina.imagem && maquina.imagem.includes('blob.vercel-storage.com')) {
+      try {
+        await del(maquina.imagem);
+      } catch (blobError) {
+        // Log do erro mas não falha a operação
+        console.error('Erro ao deletar imagem do Blob:', blobError);
+        // Continua com a deleção da máquina mesmo se a imagem falhar
+      }
+    }
+
+    // Deletar a máquina do banco (cascade vai deletar peças relacionadas)
     await db.delete(maquinas).where(eq(maquinas.id, id));
 
     revalidatePath('/maquinas');

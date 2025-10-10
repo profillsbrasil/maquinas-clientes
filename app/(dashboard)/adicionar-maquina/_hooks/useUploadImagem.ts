@@ -42,8 +42,8 @@ export function useUploadImagem(): UseUploadImagem {
     }
 
     // Validação: tamanho
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Imagem muito grande (máx 10MB)');
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error('Imagem muito grande (máx 8MB)');
       setError('Tamanho excedido');
       return;
     }

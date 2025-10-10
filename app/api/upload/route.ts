@@ -10,7 +10,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // Configurações
-const MAX_BYTES = 10 * 1024 * 1024; // 10MB de entrada
+const MAX_BYTES = 8 * 1024 * 1024; // 8MB de entrada
 const MAX_DIMENSION = 2048; // Limita lado maior da imagem
 const WEBP_QUALITY = 85; // Qualidade do WebP (0-100)
 const WEBP_EFFORT = 3; // Esforço de compressão (0-6, menor = mais rápido)
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Validação: tamanho
     if (file.size > MAX_BYTES) {
       return NextResponse.json<UploadResult>(
-        { success: false, error: 'Imagem muito grande (máximo 10MB)' },
+        { success: false, error: 'Imagem muito grande (máximo 8MB)' },
         { status: 400 }
       );
     }

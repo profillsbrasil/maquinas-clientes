@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import db from '@/db/connection';
 import { maquinas } from '@/db/schema/maquinas';
 import { pecasNaMaquina } from '@/db/schema/pecas_na_maquina';
+import { del } from '@vercel/blob';
 
 import { eq } from 'drizzle-orm';
 
@@ -132,6 +133,27 @@ export async function editarMaquinaCompleta(
         success: false,
         message: 'Adicione pelo menos uma peça'
       };
+    }
+
+    // Buscar imagem antiga para deletar se for diferente
+    const [maquinaAntiga] = await db
+      .select({ imagem: maquinas.imagem })
+      .from(maquinas)
+      .where(eq(maquinas.id, id))
+      .limit(1);
+
+    // Deletar imagem antiga do Blob se mudou e é URL do Blob
+    if (
+      maquinaAntiga &&
+      maquinaAntiga.imagem !== imagemUrl &&
+      maquinaAntiga.imagem.includes('blob.vercel-storage.com')
+    ) {
+      try {
+        await del(maquinaAntiga.imagem);
+      } catch (blobError) {
+        // Log do erro mas não falha a operação
+        console.error('Erro ao deletar imagem antiga do Blob:', blobError);
+      }
     }
 
     // Atualizar tudo em transação
