@@ -1,67 +1,86 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { toast } from 'sonner';
 
-type ImagemUpload = {
-  url: string;
+export type ImagemUpload = {
+  url: string; // data URL (ou URL pública no futuro)
   nome: string;
+  width?: number;
+  height?: number;
+  mime?: string;
+  bytes?: number;
 };
 
-export function useUploadImagem() {
+type UseUploadImagem = {
+  imagem: ImagemUpload | null;
+  uploading: boolean;
+  error: string | null;
+  handleUpload: (file: File) => Promise<void>;
+  removerImagem: () => void;
+};
+
+export function useUploadImagem(): UseUploadImagem {
   const [imagem, setImagem] = useState<ImagemUpload | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  async function handleUpload(file: File) {
+  const removerImagem = useCallback(() => {
+    setImagem(null);
+    setError(null);
+  }, []);
+
+  const handleUpload = useCallback(async (file: File) => {
+    setError(null);
+
     if (!file.type.startsWith('image/')) {
       toast.error('Selecione uma imagem válida');
+      setError('Arquivo não é imagem');
       return;
     }
-
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Imagem muito grande (máx 5MB)');
+      setError('Tamanho excedido');
       return;
     }
 
-    const loadingToast = toast.loading('Fazendo upload...');
+    const loading = toast.loading('Fazendo upload...');
     setUploading(true);
 
     try {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('/api/upload', {
+      const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       });
+      const data = await res.json();
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
+      if (!res.ok || !data.success) {
         throw new Error(data.error || 'Erro no upload');
       }
 
-      setImagem({ url: data.url, nome: file.name });
-      toast.dismiss(loadingToast);
+      setImagem({
+        url: data.url,
+        nome: file.name,
+        width: data.width,
+        height: data.height,
+        mime: data.mime,
+        bytes: data.bytes
+      });
       toast.success('Imagem carregada!');
-    } catch (error) {
-      toast.dismiss(loadingToast);
-      toast.error(error instanceof Error ? error.message : 'Erro no upload');
-      console.error('Erro no upload:', error);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Erro no upload';
+      setError(msg);
+      toast.error(msg);
+      console.error('Erro no upload:', e);
     } finally {
+      toast.dismiss(loading);
       setUploading(false);
     }
-  }
+  }, []);
 
-  function removerImagem() {
-    setImagem(null);
-  }
-
-  return {
-    imagem,
-    uploading,
-    handleUpload,
-    removerImagem
-  };
+  return { imagem, uploading, error, handleUpload, removerImagem };
 }
