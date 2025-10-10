@@ -11,10 +11,16 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, // Defina como true se quiser verificação de email
+    requireEmailVerification: false,
     minPasswordLength: 8,
     maxPasswordLength: 128
   },
+  // URL base da aplicação (OBRIGATÓRIO para Vercel)
+  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
+
+  // Secret para assinar tokens (OBRIGATÓRIO para produção)
+  secret: process.env.BETTER_AUTH_SECRET,
+
   // Configurações de sessão
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 dias
@@ -24,12 +30,14 @@ export const auth = betterAuth({
       maxAge: 5 * 60 // Cache de 5 minutos
     }
   },
-  // Origens confiáveis (adicione seu domínio de produção aqui)
+
+  // Origens confiáveis
   trustedOrigins: [
     'http://localhost:3000',
-    process.env.BETTER_AUTH_URL || '',
-    process.env.NEXT_PUBLIC_APP_URL || ''
-  ].filter(Boolean),
+    process.env.BETTER_AUTH_URL,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined
+  ].filter(Boolean) as string[],
+
   // Configurações de segurança
   advanced: {
     cookiePrefix: 'auth',
@@ -37,6 +45,6 @@ export const auth = betterAuth({
       enabled: false
     },
     useSecureCookies: process.env.NODE_ENV === 'production',
-    generateId: undefined // Usa o gerador padrão do Better Auth
+    generateId: undefined
   }
 });

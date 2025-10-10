@@ -9,10 +9,11 @@ Sistema de gestão de clientes com autenticação.
 bun install
 
 # Configurar .env
-TURSO_DATABASE_URL=sua-url
-TURSO_AUTH_TOKEN=seu-token
-BETTER_AUTH_SECRET=gerar-com-openssl-rand-base64-32
+TURSO_DATABASE_URL=libsql://sua-database.turso.io
+TURSO_AUTH_TOKEN=seu-token-turso
+BETTER_AUTH_SECRET=use-openssl-rand-base64-32-para-gerar
 BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Aplicar schema
 bun run db:push
@@ -84,6 +85,24 @@ bun run build        # Build
 bun run db:push      # Aplicar schema
 bun run db:studio    # UI do banco
 ```
+
+## 🚀 Deploy na Vercel
+
+Para fazer deploy na Vercel, consulte o guia completo em [DEPLOY_VERCEL.md](./DEPLOY_VERCEL.md).
+
+**Resumo rápido:**
+
+1. Configure as variáveis de ambiente na Vercel
+2. Push para o repositório
+3. Vercel faz deploy automaticamente
+
+**Variáveis obrigatórias:**
+
+- `BETTER_AUTH_URL` - URL do seu app (https://seu-dominio.vercel.app)
+- `BETTER_AUTH_SECRET` - Gere com `openssl rand -base64 32`
+- `NEXT_PUBLIC_APP_URL` - Mesma URL do app
+- `TURSO_DATABASE_URL` - URL do banco Turso
+- `TURSO_AUTH_TOKEN` - Token de autenticação do Turso
 
 ## Route Groups (Next.js 13+)
 
