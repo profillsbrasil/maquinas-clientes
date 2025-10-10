@@ -1,69 +1,10 @@
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
 'use server';
 
 import {
   requireAdmin,
   requireEngineerOrAdmin,
   requireRole
-} from '@/lib/server-auth-helpers';
-
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
-
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
-
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
-
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
-
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
-
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
-
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
-
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
-
-/**
- * EXEMPLO de como proteger Server Actions com validação de role
- *
- * Este arquivo serve como referência - copie esses padrões para suas actions
- */
+} from '@/lib/examples/server-auth-helpers';
 
 /**
  * EXEMPLO de como proteger Server Actions com validação de role

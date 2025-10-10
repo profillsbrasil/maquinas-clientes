@@ -3,6 +3,7 @@ import { schema } from '@/db/schema';
 
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { nanoid } from 'nanoid';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -58,6 +59,6 @@ export const auth = betterAuth({
       enabled: false
     },
     useSecureCookies: process.env.NODE_ENV === 'production',
-    generateId: undefined
+    generateId: () => nanoid(8)
   }
 });

@@ -1,39 +1,50 @@
-import { notFound } from 'next/navigation';
+'use client';
 
-import MaquinasData from './_components/MaquinasData';
-import Envolvedora from './_components/maquinas/Envolvedora';
-import Tp from './_components/maquinas/Tp';
+import { use } from 'react';
 
-interface MaquinaPageProps {
+import { useSuaMaquina } from '../_hooks/useSuasMaquinas';
+import MaquinaSkeletonVisualizar from './_components/MaquinaSkeletonVisualizar';
+import MaquinaVisualizar from './_components/MaquinaVisualizar';
+
+interface Props {
   params: Promise<{
     maquinaId: string;
   }>;
 }
 
-export default async function MaquinaPage({ params }: MaquinaPageProps) {
-  const { maquinaId } = await params;
+export default function SuaMaquinaPage({ params }: Props) {
+  const { maquinaId } = use(params);
+  const idNumerico = parseInt(maquinaId, 10);
 
-  const maquina = MaquinasData.find(
-    (maquina) => maquina.id === parseInt(maquinaId)
-  );
+  const { data: maquina, isLoading, error } = useSuaMaquina(idNumerico);
 
-  if (!maquina) {
-    notFound();
+  if (isLoading) {
+    return (
+      <main className='flex-1 h-full w-full'>
+        <MaquinaSkeletonVisualizar />
+      </main>
+    );
   }
 
-  // Renderiza o componente específico com base no ID da máquina
-  const renderMaquinaComponent = () => {
-    switch (maquinaId) {
-      case '1':
-        return <Tp maquina={maquina} />;
-      case '2':
-        return <Envolvedora maquina={maquina} />;
-      default:
-        notFound();
-    }
-  };
+  if (error || !maquina) {
+    return (
+      <main className='flex-1 h-full w-full flex items-center justify-center'>
+        <div className='text-center space-y-4'>
+          <div className='text-6xl'>⚠️</div>
+          <h2 className='text-2xl font-bold'>Máquina não encontrada</h2>
+          <p className='text-muted-foreground'>
+            {error instanceof Error
+              ? error.message
+              : 'Erro ao carregar máquina ou você não tem acesso a ela'}
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className='flex-1 h-full w-full'>{renderMaquinaComponent()}</main>
+    <main className='flex-1 h-full w-full'>
+      <MaquinaVisualizar maquina={maquina} />
+    </main>
   );
 }

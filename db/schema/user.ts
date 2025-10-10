@@ -31,6 +31,8 @@ export const user = sqliteTable('user', {
     .default(false),
   image: text('image'),
   role: text('role').notNull().default('cliente').$type<Role>(),
+  companyName: text('company_name'),
+  companyCnpj: text('company_cnpj'),
   createdAt: timestamp('created_at')
     .notNull()
     .default(sql`(datetime('now'))`),
