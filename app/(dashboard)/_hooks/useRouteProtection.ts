@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 
 import { usePathname, useRouter } from 'next/navigation';
 
-import { hasRole } from '@/lib/auth-helpers';
-import type { Session } from '@/lib/auth-types';
+import { hasRole } from '@/lib/auth/auth-helpers';
+import type { Session } from '@/lib/auth/auth-types';
 
 import { navItems } from '../_components/sidebar/nav-config';
 

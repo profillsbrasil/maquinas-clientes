@@ -6,16 +6,11 @@ import db from '@/db/connection';
 import { maquinas } from '@/db/schema/maquinas';
 import { pecas } from '@/db/schema/pecas';
 import { pecasNaMaquina } from '@/db/schema/pecas_na_maquina';
+import type { ActionResult } from '@/db/schema/types';
 import { userMaquinas } from '@/db/schema/user_maquinas';
-import { auth } from '@/lib/auth';
+import { auth } from '@/lib/auth/auth';
 
 import { and, eq, sql } from 'drizzle-orm';
-
-type ActionResult<T = void> = {
-  success: boolean;
-  message: string;
-  data?: T;
-};
 
 type ListarSuasMaquinasResult = {
   maquinas: {

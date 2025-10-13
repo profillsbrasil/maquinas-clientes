@@ -1,10 +1,14 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useSession } from '@/lib/auth-client';
+import { useSession } from '@/lib/auth/auth-client';
+import type { SessionUser } from '@/lib/auth/auth-types';
+
+import { useSuasMaquinas } from '../../lib/hooks/useSuasMaquinas';
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+  const { data: suasMaquinas } = useSuasMaquinas();
 
   if (!session) return null;
 
@@ -22,13 +26,15 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className='text-sm font-medium text-muted-foreground'>
-                Total de Clientes
+                Total de Maquinas
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className='text-3xl font-bold'>0</div>
+              <div className='text-3xl font-bold'>{suasMaquinas?.total}</div>
               <p className='text-xs text-muted-foreground mt-1'>
-                Nenhum cliente cadastrado
+                {suasMaquinas?.total === 0
+                  ? 'Nenhuma maquina cadastrada'
+                  : `Máquina${suasMaquinas?.total !== 1 ? 's' : ''} cadastrada${suasMaquinas?.total !== 1 ? 's' : ''}`}
               </p>
             </CardContent>
           </Card>
@@ -40,11 +46,9 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className='text-3xl font-bold'>Ativa</div>
-              <p className='text-xs text-muted-foreground mt-1'>
-                Email:{' '}
-                {session.user.emailVerified ? 'Verificado ✓' : 'Não verificado'}
-              </p>
+              <div className='text-3xl font-bold'>
+                {(session.user as SessionUser).status ? 'Ativa' : 'Inativa'}
+              </div>
             </CardContent>
           </Card>
 

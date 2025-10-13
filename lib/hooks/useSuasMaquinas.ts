@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   buscarSuaMaquina,
   listarSuasMaquinas
-} from '../_actions/listar-suas-maquinas';
+} from '../../app/(dashboard)/suas-maquinas/_actions/listar-suas-maquinas';
 
 // Keys para queries
 export const suasMaquinasKeys = {

@@ -5,15 +5,10 @@ import { revalidatePath } from 'next/cache';
 import db from '@/db/connection';
 import { maquinas } from '@/db/schema/maquinas';
 import { pecasNaMaquina } from '@/db/schema/pecas_na_maquina';
+import type { ActionResult } from '@/db/schema/types';
 import { del } from '@vercel/blob';
 
 import { eq } from 'drizzle-orm';
-
-type ActionResult<T = void> = {
-  success: boolean;
-  message: string;
-  data?: T;
-};
 
 // Atualiza dados básicos da máquina (nome e imagem)
 export async function editarMaquina(

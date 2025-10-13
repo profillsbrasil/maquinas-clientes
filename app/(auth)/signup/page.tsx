@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { signUp } from '@/lib/auth-client';
+import { signUp } from '@/lib/auth/auth-client';
 
 export default function SignUpPage() {
   const router = useRouter();

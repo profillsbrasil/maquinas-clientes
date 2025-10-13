@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { suasMaquinasKeys } from '../../../../lib/hooks/useSuasMaquinas';
 import { buscarSuaMaquina } from '../_actions/listar-suas-maquinas';
-import { suasMaquinasKeys } from '../_hooks/useSuasMaquinas';
 import { Eye, Package } from 'lucide-react';
 
 type Props = {

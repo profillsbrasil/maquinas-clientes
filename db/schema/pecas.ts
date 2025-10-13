@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import {
   customType,
   integer,
@@ -30,3 +31,7 @@ export const pecas = sqliteTable('pecas', {
     .default(sql`(datetime('now'))`)
     .$onUpdate(() => new Date())
 });
+
+// Tipos inferidos automaticamente do schema
+export type Peca = InferSelectModel<typeof pecas>;
+export type InsertPeca = InferInsertModel<typeof pecas>;

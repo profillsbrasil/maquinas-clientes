@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { customType, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 const timestamp = customType<{ data: Date; driverData: string }>({
@@ -26,3 +27,7 @@ export const verification = sqliteTable('verification', {
     .default(sql`(datetime('now'))`)
     .$onUpdate(() => new Date())
 });
+
+// Tipos inferidos automaticamente do schema
+export type Verification = InferSelectModel<typeof verification>;
+export type InsertVerification = InferInsertModel<typeof verification>;

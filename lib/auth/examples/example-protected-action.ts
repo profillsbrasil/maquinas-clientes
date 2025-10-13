@@ -4,7 +4,7 @@ import {
   requireAdmin,
   requireEngineerOrAdmin,
   requireRole
-} from '@/lib/examples/server-auth-helpers';
+} from '@/lib/auth/examples/server-auth-helpers';
 
 /**
  * EXEMPLO de como proteger Server Actions com validação de role

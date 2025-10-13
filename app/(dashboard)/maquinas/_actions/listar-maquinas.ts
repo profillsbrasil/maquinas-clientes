@@ -6,15 +6,10 @@ import db from '@/db/connection';
 import { maquinas } from '@/db/schema/maquinas';
 import { pecas } from '@/db/schema/pecas';
 import { pecasNaMaquina } from '@/db/schema/pecas_na_maquina';
+import type { ActionResult } from '@/db/schema/types';
 import { del } from '@vercel/blob';
 
 import { eq, sql } from 'drizzle-orm';
-
-type ActionResult<T = void> = {
-  success: boolean;
-  message: string;
-  data?: T;
-};
 
 type ListarMaquinasResult = {
   maquinas: {

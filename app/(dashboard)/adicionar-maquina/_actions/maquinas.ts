@@ -6,12 +6,7 @@ import db from '@/db/connection';
 import { maquinas } from '@/db/schema/maquinas';
 import { pecas } from '@/db/schema/pecas';
 import { pecasNaMaquina } from '@/db/schema/pecas_na_maquina';
-
-type ActionResult<T = void> = {
-  success: boolean;
-  message: string;
-  data?: T;
-};
+import type { ActionResult } from '@/db/schema/types';
 
 // Lista peças disponíveis para adicionar
 export async function listarPecasDisponiveis(): Promise<

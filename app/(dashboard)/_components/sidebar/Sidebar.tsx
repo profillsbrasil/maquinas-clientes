@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import { handleLogout, hasRole } from '@/lib/auth-helpers';
-import type { Session } from '@/lib/auth-types';
+import { handleLogout, hasRole } from '@/lib/auth/auth-helpers';
+import type { Session } from '@/lib/auth/auth-types';
 import iconeProfills from '@/public/icon.png';
 
 import NavButton from './NavButton';

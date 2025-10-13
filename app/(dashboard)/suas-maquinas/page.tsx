@@ -13,10 +13,10 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination';
+import { useSuasMaquinas } from '@/lib/hooks/useSuasMaquinas';
 
 import CardMaquinaCliente from './_components/CardMaquinaCliente';
 import MaquinasSkeletonGrid from './_components/MaquinasSkeletonGrid';
-import { useSuasMaquinas } from './_hooks/useSuasMaquinas';
 
 const ITEMS_POR_PAGINA = 8;
 

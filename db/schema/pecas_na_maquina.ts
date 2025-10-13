@@ -1,5 +1,6 @@
 import { maquinas } from './maquinas';
 import { pecas } from './pecas';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { integer, sqliteTable } from 'drizzle-orm/sqlite-core';
 
 export const pecasNaMaquina = sqliteTable('pecas_na_maquina', {
@@ -12,3 +13,7 @@ export const pecasNaMaquina = sqliteTable('pecas_na_maquina', {
     .references(() => pecas.id, { onDelete: 'cascade' }),
   localizacao: integer('localizacao').notNull()
 });
+
+// Tipos inferidos automaticamente do schema
+export type PecaNaMaquina = InferSelectModel<typeof pecasNaMaquina>;
+export type InsertPecaNaMaquina = InferInsertModel<typeof pecasNaMaquina>;

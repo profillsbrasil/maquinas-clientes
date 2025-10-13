@@ -1,5 +1,6 @@
 import { user } from './user';
 import { sql } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { customType, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 const timestamp = customType<{ data: Date; driverData: string }>({
@@ -31,3 +32,7 @@ export const session = sqliteTable('session', {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' })
 });
+
+// Tipos inferidos automaticamente do schema
+export type Session = InferSelectModel<typeof session>;
+export type InsertSession = InferInsertModel<typeof session>;

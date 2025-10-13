@@ -7,8 +7,12 @@ import { headers } from 'next/headers';
 
 import type { Role } from '@/db/schema/user';
 
-import { auth } from '../auth';
-import type { Session } from '../auth-types';
+import { auth } from '../auth/auth';
+import type { Session } from '../auth/auth-types';
+
+/**
+ * Helpers de autenticação para uso em Server Actions e Server Components
+ */
 
 /**
  * Helpers de autenticação para uso em Server Actions e Server Components

@@ -1,22 +1,11 @@
-// Type para peça
-export type Peca = {
-  id: number;
-  nome: string;
-  linkLojaIntegrada: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+/**
+ * Tipos específicos do módulo de peças
+ * Usa tipos inferidos dos schemas Drizzle quando possível
+ */
+import type { ActionResult, InsertPeca, Peca } from '@/db/schema/types';
 
-// Type para criar/editar peça
-export type PecaFormData = {
-  nome: string;
-  linkLojaIntegrada: string;
-};
+// Re-exporta tipos do schema
+export type { Peca, ActionResult };
 
-// Type para resultado de action
-export type ActionResult<T = void> = {
-  success: boolean;
-  message: string;
-  data?: T;
-  errors?: Record<string, string[]>;
-};
+// Type para criar/editar peça (baseado em InsertPeca mas sem campos auto-gerados)
+export type PecaFormData = Pick<InsertPeca, 'nome' | 'linkLojaIntegrada'>;

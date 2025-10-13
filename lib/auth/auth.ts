@@ -25,6 +25,27 @@ export const auth = betterAuth({
         required: true,
         defaultValue: 'cliente',
         input: false // Não permite que o usuário defina o role ao se registrar
+      },
+      status: {
+        type: 'boolean',
+        required: true,
+        defaultValue: true,
+        input: false
+      },
+      userPhone: {
+        type: 'string',
+        required: false,
+        input: true
+      },
+      companyName: {
+        type: 'string',
+        required: false,
+        input: true
+      },
+      companyCnpj: {
+        type: 'string',
+        required: false,
+        input: true
       }
     }
   },

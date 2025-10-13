@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 
-import { useSuaMaquina } from '../_hooks/useSuasMaquinas';
+import { useSuaMaquina } from '../../../../lib/hooks/useSuasMaquinas';
 import MaquinaSkeletonVisualizar from './_components/MaquinaSkeletonVisualizar';
 import MaquinaVisualizar from './_components/MaquinaVisualizar';
 

@@ -29,3 +29,6 @@ export const schema = {
   pecasNaMaquina,
   pecasNaMaquinaRelations
 };
+
+// Re-exporta todos os tipos centralizados
+export * from './types';

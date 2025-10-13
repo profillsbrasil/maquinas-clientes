@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 
 import { usePathname, useRouter } from 'next/navigation';
 
-import { useSession } from '@/lib/auth-client';
-import { redirectIfNotAuthenticated } from '@/lib/auth-helpers';
+import { useSession } from '@/lib/auth/auth-client';
+import { redirectIfNotAuthenticated } from '@/lib/auth/auth-helpers';
+import type { Session } from '@/lib/auth/auth-types';
 import QueryProvider from '@/lib/providers/QueryProvider';
 
 import Header from './_components/sidebar/Header';
@@ -30,7 +31,7 @@ export default function DashboardLayout({
   }, [session, isPending, router]);
 
   // Proteção de rotas baseada em permissões
-  useRouteProtection(session);
+  useRouteProtection(session as Session | null);
 
   if (isPending) {
     return (
@@ -48,7 +49,7 @@ export default function DashboardLayout({
     <QueryProvider>
       <div className='flex min-h-screen'>
         <Sidebar
-          session={session}
+          session={session as Session}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />

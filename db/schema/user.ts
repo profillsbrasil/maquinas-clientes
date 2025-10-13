@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import {
   customType,
   integer,
@@ -29,10 +30,12 @@ export const user = sqliteTable('user', {
   emailVerified: integer('email_verified', { mode: 'boolean' })
     .notNull()
     .default(false),
+  status: integer('status', { mode: 'boolean' }).notNull().default(true),
   image: text('image'),
   role: text('role').notNull().default('cliente').$type<Role>(),
   companyName: text('company_name'),
   companyCnpj: text('company_cnpj'),
+  userPhone: text('user_phone'),
   createdAt: timestamp('created_at')
     .notNull()
     .default(sql`(datetime('now'))`),
@@ -41,3 +44,7 @@ export const user = sqliteTable('user', {
     .default(sql`(datetime('now'))`)
     .$onUpdate(() => new Date())
 });
+
+// Tipos inferidos automaticamente do schema
+export type User = InferSelectModel<typeof user>;
+export type InsertUser = InferInsertModel<typeof user>;

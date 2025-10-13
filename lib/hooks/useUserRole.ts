@@ -5,8 +5,12 @@
 
 import type { Role } from '@/db/schema/user';
 
-import { useSession } from '../auth-client';
-import type { Session } from '../auth-types';
+import { useSession } from '../auth/auth-client';
+import type { Session } from '../auth/auth-types';
+
+/**
+ * Hook customizado para acessar o role do usuário
+ */
 
 /**
  * Hook customizado para acessar o role do usuário

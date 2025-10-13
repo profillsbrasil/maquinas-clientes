@@ -1,6 +1,7 @@
 import { maquinas } from './maquinas';
 import { user } from './user';
 import { sql } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import {
   customType,
   integer,
@@ -36,3 +37,7 @@ export const userMaquinas = sqliteTable('user_maquinas', {
     .default(sql`(datetime('now'))`)
     .$onUpdate(() => new Date())
 });
+
+// Tipos inferidos automaticamente do schema
+export type UserMaquina = InferSelectModel<typeof userMaquinas>;
+export type InsertUserMaquina = InferInsertModel<typeof userMaquinas>;
